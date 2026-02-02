@@ -84,6 +84,8 @@ export const adminTranslations = {
         saveSuccess: 'Saved successfully',
         deleteSuccess: 'Deleted successfully',
         error: 'An error occurred',
+        noRentals: 'No rentals found',
+        completed: 'Completed',
     },
 
     fr: {
@@ -171,6 +173,8 @@ export const adminTranslations = {
         saveSuccess: 'Enregistré avec succès',
         deleteSuccess: 'Supprimé avec succès',
         error: 'Une erreur s\'est produite',
+        noRentals: 'Aucune location trouvée',
+        completed: 'Terminé',
     },
 };
 
