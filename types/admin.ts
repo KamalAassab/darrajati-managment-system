@@ -1,0 +1,96 @@
+// Admin System Type Definitions
+
+export interface Scooter {
+    id: string;
+    slug: string;
+    name: string;
+    image: string;
+    engine: string;
+    speed: string;
+    price: number;
+    status: 'available' | 'rented' | 'maintenance';
+    plate: string;
+    lastMaintenance: string;
+    desc: {
+        en: string;
+        fr: string;
+        ar: string;
+    };
+    features?: {
+        en: string[];
+        fr: string[];
+        ar: string[];
+    };
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Client {
+    id: string;
+    fullName: string;
+    documentId: string; // CIN or Passport
+    phone: string;
+    hasDeposit: boolean;
+    depositAmount: number;
+    currentScooter?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Rental {
+    id: string;
+    scooterId: string;
+    clientId: string;
+    startDate: string;
+    endDate: string;
+    totalPrice: number;
+    amountPaid: number;
+    status: 'active' | 'completed' | 'cancelled';
+    paymentStatus: 'paid' | 'pending' | 'partial';
+    paymentMethod: 'cash' | 'transfer';
+    notes?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Expense {
+    id: string;
+    category: 'maintenance' | 'fuel' | 'advertising' | 'salary' | 'rent' | 'insurance' | 'other';
+    amount: number;
+    date: string;
+    description: string;
+    createdAt: string;
+}
+
+export interface DashboardStats {
+    totalRevenue: number;
+    totalExpenses: number;
+    netProfit: number;
+    activeRentals: number;
+    overdueRentals: number;
+    availableScooters: number;
+    totalScooters: number;
+}
+
+export interface AnalyticsData {
+    monthlyStats: {
+        month: string;
+        revenue: number;
+        expenses: number;
+    }[];
+    topScooters: {
+        id: string;
+        name: string;
+        revenue: number;
+        trips: number;
+        plate: string;
+    }[];
+    tips: string[];
+}
+
+export interface RentalWithDetails extends Rental {
+    scooter: Scooter;
+    client: Client;
+}
+
+export type Language = 'en' | 'fr' | 'ar';

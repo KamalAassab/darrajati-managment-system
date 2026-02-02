@@ -1,0 +1,217 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent horizontal scrolling */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-poppins), sans-serif;
+  font-weight: 400;
+  position: relative;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Touch optimization */
+@layer utilities {
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Hide number input spinners */
+  .hide-number-spinner::-webkit-inner-spin-button,
+  .hide-number-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .hide-number-spinner {
+    -moz-appearance: textfield;
+  }
+}
+
+:root {
+  --orange: #ff710b;
+  --orange-dark: #e56000;
+}
+
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:flex-row-reverse {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .rtl\:space-x-reverse> :not([hidden])~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* Arabic specific styles */
+[dir="rtl"] .font-anton {
+  font-family: var(--font-alexandria), sans-serif;
+  font-weight: 800;
+}
+
+[dir="rtl"] body {
+  font-family: var(--font-alexandria), sans-serif;
+}
+
+/* Ensure proper text alignment in RTL for form inputs */
+[dir="rtl"] input,
+[dir="rtl"] textarea {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Hide scrollbar for all browsers */
+* {
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
+
+/* RTL-specific utilities */
+[dir="rtl"] .rtl\:text-right {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl\:text-left {
+  text-align: left;
+}
+
+[dir="rtl"] .rtl\:right-auto {
+  right: auto;
+}
+
+[dir="rtl"] .rtl\:left-auto {
+  left: auto;
+}
+
+[dir="rtl"] .rtl\:translate-x-0 {
+  transform: translateX(0);
+}
+
+[dir="rtl"] .rtl\:space-x-reverse>*+* {
+  margin-left: 0;
+  margin-right: var(--tw-space-x-reverse, 0);
+}
+
+/* Flag icons with rounded corners */
+.fi {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Spin animation for loading overlay */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Neo-Glassmorphism & Cyber Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-dark {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.orange-glow {
+  box-shadow: 0 0 20px rgba(255, 113, 11, 0.2);
+}
+
+.orange-glow-border {
+  border-color: rgba(255, 113, 11, 0.3);
+  box-shadow: 0 0 15px rgba(255, 113, 11, 0.15);
+}
+
+.text-glow-orange {
+  text-shadow: 0 0 10px rgba(255, 113, 11, 0.4);
+}
+
+.bg-cyber-grid {
+  background-image: radial-gradient(circle at 1px 1px, rgba(255, 113, 11, 0.05) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 25px rgba(255, 113, 11, 0.25);
+  border-color: rgba(255, 113, 11, 0.4);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
+
+/* Custom Scrollbar for Admin */
+.admin-scrollbar::-webkit-scrollbar {
+  display: block;
+  width: 6px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 113, 11, 0.2);
+  border-radius: 10px;
+}
+
+.admin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 113, 11, 0.4);
+}
