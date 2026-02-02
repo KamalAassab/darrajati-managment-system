@@ -35,7 +35,7 @@ export function AdminScootersTable({ scooters }: AdminScootersTableProps) {
     const handleStatusChange = async (id: string, status: string) => {
         setUpdating(id);
 
-        const result = await updateStatusAction(id, status);
+        const result = await updateStatusAction(id, status as 'available' | 'rented' | 'maintenance');
 
         if (result.success) {
             router.refresh();
