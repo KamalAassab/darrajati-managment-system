@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
-import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 interface StatusSelectorProps {
     currentStatus: 'available' | 'rented' | 'maintenance';
@@ -9,7 +8,6 @@ interface StatusSelectorProps {
 }
 
 export function StatusSelector({ currentStatus, onStatusChange, isLoading }: StatusSelectorProps) {
-    const { t } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -44,9 +42,9 @@ export function StatusSelector({ currentStatus, onStatusChange, isLoading }: Sta
     };
 
     const options = [
-        { value: 'available', label: t('available'), color: 'text-green-500' },
-        { value: 'rented', label: t('rented'), color: 'text-orange' },
-        { value: 'maintenance', label: t('maintenance'), color: 'text-red-500' }
+        { value: 'available', label: 'Available', color: 'text-green-500' },
+        { value: 'rented', label: 'Rented', color: 'text-orange' },
+        { value: 'maintenance', label: 'Maintenance', color: 'text-red-500' }
     ];
 
     return (

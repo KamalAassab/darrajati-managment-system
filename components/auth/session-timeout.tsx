@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 const IDLE_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 // const IDLE_TIMEOUT_MS = 10 * 1000; // 10 seconds (for testing)
 
-type ActivityEvent = MouseEvent | KeyboardEvent | TouchEvent | ScrollEvent;
+type ActivityEvent = MouseEvent | KeyboardEvent | TouchEvent | Event;
 
 export function SessionTimeout() {
     const router = useRouter();

@@ -1,10 +1,11 @@
 'use client';
 
 import { RentalWithDetails } from '@/types/admin';
-import { formatMAD, formatDate, isOverdue } from '@/lib/utils/currency';
+import { formatMAD, formatDate, formatDateShort, isOverdue } from '@/lib/utils/currency';
 import { Calendar, User, Bike, DollarSign, CheckCircle, AlertCircle, Clock, Trash2, Edit2, CreditCard } from 'lucide-react';
 import DeleteRentalButton from '@/app/dashboard/rentals/components/DeleteRentalButton';
 import CompleteRentalButton from '@/app/dashboard/rentals/components/CompleteRentalButton';
+import RevertRentalButton from '@/app/dashboard/rentals/components/RevertRentalButton';
 
 interface RentalCardProps {
     rental: RentalWithDetails;
@@ -17,103 +18,81 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
     const isPaid = remaining <= 0;
 
     return (
-        <div className={`group relative bg-[#0a0a0a] border hover:border-orange/50 rounded-3xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-orange/10 flex flex-col ${overdue ? 'border-red-500/30' : 'border-white/10'}`}>
-            {/* Header / Banner */}
-            <div className={`p-6 bg-gradient-to-r relative ${overdue ? 'from-red-500/10' : 'from-white/5'} to-transparent flex justify-between items-start`}>
+        <div className={`group/rental relative bg-[#0a0a0a] border rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col ${overdue
+            ? 'border-red-500/50 shadow-[0_0_30px_-10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_50px_-10px_rgba(239,68,68,0.4)]'
+            : 'border-white/10 hover:border-orange/50 hover:shadow-orange/5'
+            }`}>
+            {/* Overdue Alert Strip */}
+            {overdue && (
+                <div className="absolute top-0 left-0 w-full h-1 bg-red-500 animate-pulse z-20" />
+            )}
+
+            {/* Header */}
+            <div className={`p-5 pb-0 flex justify-between items-start relative z-10 ${overdue ? 'bg-gradient-to-b from-red-500/10 to-transparent' : ''}`}>
                 <div>
-                    <h3 className="text-lg font-bold text-white uppercase tracking-tight mb-1 group-hover:text-orange transition-colors truncate max-w-[180px]">
+                    <h3 className="text-lg font-black font-outfit text-white uppercase tracking-tight truncate max-w-[180px] group-hover/rental:text-orange transition-colors">
                         {rental.client.fullName}
                     </h3>
-                    <div className="flex items-center gap-1.5 text-white/40">
-                        <User className="w-3.5 h-3.5" />
-                        <span className="text-xs font-bold">{rental.client.phone}</span>
+                    <div className="flex items-center gap-1.5 mt-1">
+                        <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${rental.status === 'active'
+                            ? overdue
+                                ? 'bg-red-500/10 border-red-500/20 text-red-500'
+                                : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                            : 'bg-green-500/10 border-green-500/20 text-green-400'
+                            }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${rental.status === 'active'
+                                ? overdue ? 'bg-red-500 animate-ping' : 'bg-blue-400 animate-pulse'
+                                : 'bg-green-400'
+                                }`} />
+                            {overdue ? 'Overdue!' : rental.status === 'active' ? 'Active' : 'Completed'}
+                        </span>
                     </div>
                 </div>
-
-                <div className="relative z-10">
-                    <span className={`px-2.5 py-1 rounded-full border text-[9px] font-bold uppercase tracking-wide flex items-center gap-1.5 ${rental.status === 'active'
-                        ? overdue ? 'bg-red-500/20 border-red-500/30 text-red-400' : 'bg-blue-500/20 border-blue-500/30 text-blue-400'
-                        : 'bg-green-500/20 border-green-500/30 text-green-400'
-                        }`}>
-                        <span className={`w-1 h-1 rounded-full animate-pulse ${rental.status === 'active'
-                            ? overdue ? 'bg-red-400' : 'bg-blue-400'
-                            : 'bg-green-400'
-                            }`} />
-                        {overdue ? 'Overdue' : rental.status}
-                    </span>
+                <div className="text-right">
+                    <p className="font-price text-lg text-white leading-none">{formatMAD(rental.totalPrice)}</p>
+                    <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${isPaid ? 'text-green-500' : 'text-red-500'}`}>
+                        {isPaid ? 'Fully Paid' : 'Unpaid'}
+                    </p>
                 </div>
             </div>
 
             {/* Content */}
-            <div className="px-6 pb-6 pt-2 relative flex-1 flex flex-col">
+            <div className="p-5 flex-1 flex flex-col gap-3">
+                {/* Scooter & Dates Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="sm:col-span-2 bg-white/[0.03] rounded-xl p-3 border border-white/[0.03] flex items-center gap-3 group/scooter">
+                        <Bike className="w-5 h-5 text-orange group-hover/scooter:scale-110 transition-transform" />
+                        <p className="text-sm font-bold text-white tracking-wide">{rental.scooter.name}</p>
+                    </div>
 
-                {/* Scooter Info */}
-                <div className="bg-white/5 rounded-xl p-3 border border-white/5 mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-orange">
-                            <Bike className="w-4 h-4" />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Scooter</p>
-                            <p className="text-sm font-bold text-white tracking-tight">{rental.scooter.name}</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Dates */}
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                    <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-1">Start</p>
-                        <div className="flex items-center gap-1.5 text-white/80">
-                            <Calendar className="w-3 h-3" />
-                            <span className="text-xs font-bold">{formatDate(rental.startDate)}</span>
-                        </div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-1">End</p>
-                        <div className="flex items-center gap-1.5 text-white/80">
-                            <Clock className="w-3 h-3" />
-                            <span className="text-xs font-bold">{formatDate(rental.endDate)}</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Financials */}
-                <div className="flex flex-col gap-3 mb-6">
-                    <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex items-center justify-between">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Duration</p>
-                        <span className="font-bold text-sm text-white">
-                            {Math.ceil(Math.abs(new Date(rental.endDate).getTime() - new Date(rental.startDate).getTime()) / (1000 * 60 * 60 * 24))} Days
-                        </span>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex items-center justify-between">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Total</p>
-                        <span className="font-bold text-sm text-white">{formatMAD(rental.totalPrice)}</span>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-3 border border-white/5 flex items-center justify-between">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/30">Paid</p>
-                        <div className="flex items-center gap-2">
-                            <span className={`font-bold text-sm ${isPaid ? 'text-green-500' : 'text-white'}`}>{formatMAD(rental.amountPaid)}</span>
-                            {!isPaid && (
-                                <span className="text-[10px] font-bold text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded">
-                                    -{formatMAD(remaining)}
-                                </span>
-                            )}
+                    <div className={`sm:col-span-2 bg-white/[0.03] rounded-xl p-3 border ${overdue ? 'border-red-500/30 bg-red-500/5' : 'border-white/[0.03]'}`}>
+                        <div className={`flex items-center gap-3 ${overdue ? 'text-red-400' : 'text-white/80'}`}>
+                            <Calendar className="w-5 h-5 text-orange" />
+                            <span className="text-xs font-black tracking-tight">
+                                {formatDateShort(rental.startDate)}
+                                <span className="mx-2 text-white/20">→</span>
+                                {formatDateShort(rental.endDate)}
+                            </span>
                         </div>
                     </div>
                 </div>
 
                 {/* Actions */}
-                <div className="mt-auto grid grid-cols-2 gap-3 opacity-100 sm:opacity-0 sm:translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                <div className="mt-auto pt-2 grid grid-cols-2 gap-2 opacity-100 sm:opacity-0 sm:translate-y-2 group-hover/rental:opacity-100 group-hover/rental:translate-y-0 transition-all duration-300">
                     {rental.status === 'active' ? (
                         <div className="col-span-2">
                             <CompleteRentalButton rentalId={rental.id} />
                         </div>
-                    ) : null}
+                    ) : (
+                        <div className="col-span-2">
+                            <RevertRentalButton rentalId={rental.id} />
+                        </div>
+                    )}
 
                     <button
                         onClick={() => onPayment(rental)}
-                        className="py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-colors border border-white/5 hover:border-orange/30"
+                        disabled={isPaid}
+                        className="py-2.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white/60 hover:text-white font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-colors border border-white/5"
                     >
                         <CreditCard className="w-3.5 h-3.5" />
                         Pay

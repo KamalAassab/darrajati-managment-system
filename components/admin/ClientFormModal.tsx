@@ -67,7 +67,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                             {isEdit ? 'Edit Client' : 'New Client'}
                         </h2>
                         <p className="text-xs text-white/50 font-mono mt-1 uppercase tracking-widest">
-                            {isEdit ? `Updating: ${client.fullName}` : 'Add a new customer to the database'}
+                            {isEdit ? 'Update client information' : 'Add a new client to the database'}
                         </p>
                     </div>
                     <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-colors">
@@ -92,12 +92,12 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                                 defaultValue={client?.fullName}
                                 required
                                 className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
-                                placeholder="e.g. Kamal Aassab"
+                                placeholder="Enter client name"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">ID Document (CIN/Passport)</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Document ID</label>
                             <input
                                 type="text"
                                 name="documentId"
@@ -109,7 +109,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Phone Number</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Phone</label>
                             <input
                                 type="tel"
                                 name="phone"
@@ -121,7 +121,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Deposit Amount (MAD)</label>
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Deposit Amount</label>
                             <input
                                 type="number"
                                 name="depositAmount"
@@ -140,10 +140,10 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                             id="hasDeposit"
                             value="true"
                             defaultChecked={client?.hasDeposit}
-                            className="w-5 h-5 rounded border-white/10 bg-white/5 text-orange focus:ring-orange accent-orange outline-none cursor-pointer"
+                            className="cursor-pointer"
                         />
                         <label htmlFor="hasDeposit" className="font-bold text-xs uppercase tracking-widest text-white cursor-pointer select-none flex-1">
-                            Deposit Secured?
+                            Deposit Secured
                         </label>
                     </div>
 
@@ -166,7 +166,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                                     Saving...
                                 </>
                             ) : (
-                                isEdit ? 'Update Client' : 'Create Client'
+                                isEdit ? 'Edit Client' : 'New Client'
                             )}
                         </button>
                     </div>

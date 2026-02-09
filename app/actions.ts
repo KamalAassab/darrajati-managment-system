@@ -20,7 +20,9 @@ export async function getScooters(): Promise<Scooter[]> {
     await requireAuth();
 
     const rows = await sql`
-        SELECT * FROM scooters ORDER BY created_at ASC
+        SELECT s.*, 
+            (SELECT COUNT(*) FROM rentals r WHERE r.scooter_id = s.id AND r.status = 'active') as active_rentals
+        FROM scooters s ORDER BY s.created_at ASC
     `;
 
     return rows.map((row: any) => ({
@@ -31,6 +33,8 @@ export async function getScooters(): Promise<Scooter[]> {
         engine: row.engine || '',
         speed: row.speed || '',
         price: Number(row.price || 0),
+        quantity: Number(row.quantity || 1),
+        activeRentals: Number(row.active_rentals || 0),
         status: row.status as any,
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at?.toString() || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at?.toString() || ''),
@@ -42,9 +46,11 @@ export async function searchScooters(searchTerm: string): Promise<Scooter[]> {
 
     const ilikeTerm = `%${searchTerm}%`;
     const rows = await sql`
-        SELECT * FROM scooters 
-        WHERE name ILIKE ${ilikeTerm}
-        ORDER BY name ASC
+        SELECT s.*,
+            (SELECT COUNT(*) FROM rentals r WHERE r.scooter_id = s.id AND r.status = 'active') as active_rentals
+        FROM scooters s 
+        WHERE s.name ILIKE ${ilikeTerm}
+        ORDER BY s.name ASC
     `;
 
     return rows.map((row: any) => ({
@@ -55,6 +61,8 @@ export async function searchScooters(searchTerm: string): Promise<Scooter[]> {
         engine: row.engine,
         speed: row.speed,
         price: Number(row.price),
+        quantity: Number(row.quantity || 1),
+        activeRentals: Number(row.active_rentals || 0),
         status: row.status,
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at || ''),
@@ -65,7 +73,9 @@ export async function getScooterById(id: string): Promise<Scooter | null> {
     await requireAuth();
 
     const rows = await sql`
-        SELECT * FROM scooters WHERE id = ${id}
+        SELECT s.*,
+             (SELECT COUNT(*) FROM rentals r WHERE r.scooter_id = s.id AND r.status = 'active') as active_rentals
+        FROM scooters s WHERE s.id = ${id}
     `;
 
     if (rows.length === 0) return null;
@@ -79,6 +89,8 @@ export async function getScooterById(id: string): Promise<Scooter | null> {
         engine: row.engine,
         speed: row.speed,
         price: Number(row.price),
+        quantity: Number(row.quantity || 1),
+        activeRentals: Number(row.active_rentals || 0),
         status: row.status,
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at || ''),
@@ -133,6 +145,7 @@ export async function createScooter(prevState: any, formData: FormData): Promise
             engine: formData.get('engine'),
             speed: formData.get('speed'),
             price: formData.get('price'),
+            quantity: formData.get('quantity') || 1,
             status: formData.get('status') || 'available',
         };
 
@@ -140,7 +153,7 @@ export async function createScooter(prevState: any, formData: FormData): Promise
 
         await sql`
             INSERT INTO scooters (
-                slug, name, image, engine, speed, price, status
+                slug, name, image, engine, speed, price, quantity, status
             ) VALUES (
                 ${slug},
                 ${validated.name},
@@ -148,6 +161,7 @@ export async function createScooter(prevState: any, formData: FormData): Promise
                 ${String(validated.engine)},
                 ${String(validated.speed)},
                 ${validated.price},
+                ${validated.quantity},
                 ${validated.status}
             )
         `;
@@ -223,6 +237,7 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
             engine: formData.get('engine'),
             speed: formData.get('speed'),
             price: formData.get('price'),
+            quantity: formData.get('quantity') || 1,
             status: formData.get('status'),
         };
 
@@ -238,6 +253,7 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
                     engine = ${String(validated.engine)}, 
                     speed = ${String(validated.speed)}, 
                     price = ${validated.price}, 
+                    quantity = ${validated.quantity},
                     status = ${validated.status}, 
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ${id}
@@ -250,6 +266,7 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
                     engine = ${String(validated.engine)}, 
                     speed = ${String(validated.speed)}, 
                     price = ${validated.price}, 
+                    quantity = ${validated.quantity},
                     status = ${validated.status}, 
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ${id}
@@ -364,6 +381,12 @@ export async function createClient(prevState: any, formData: FormData): Promise<
 
         const validated = clientSchema.parse(data);
 
+        // Check for existing Document ID
+        const existing = await sql`SELECT id FROM clients WHERE document_id = ${validated.documentId}`;
+        if (existing.length > 0) {
+            return { success: false, message: `A client with Document ID ${validated.documentId} already exists.` };
+        }
+
         await sql`
             INSERT INTO clients (full_name, document_id, phone, has_deposit, deposit_amount)
             VALUES (${validated.fullName}, ${validated.documentId}, ${validated.phone}, ${validated.hasDeposit}, ${validated.depositAmount})
@@ -391,6 +414,15 @@ export async function updateClient(id: string, formData: FormData): Promise<Acti
 
         const validated = clientSchema.parse(data);
 
+        // Check for existing Document ID (excluding current client)
+        const existing = await sql`
+            SELECT id FROM clients 
+            WHERE document_id = ${validated.documentId} AND id != ${id}
+        `;
+        if (existing.length > 0) {
+            return { success: false, message: `Another client with Document ID ${validated.documentId} already exists.` };
+        }
+
         await sql`
             UPDATE clients 
             SET full_name = ${validated.fullName}, 
@@ -413,6 +445,20 @@ export async function deleteClient(id: string): Promise<ActionState> {
     await requireAuth();
 
     try {
+        // Check if client has any rental records
+        const rentalCheck = await sql`
+            SELECT COUNT(*) as count FROM rentals WHERE client_id = ${id}
+        `;
+
+        const rentalCount = Number(rentalCheck[0]?.count || 0);
+
+        if (rentalCount > 0) {
+            return {
+                success: false,
+                message: `Cannot delete this client. They have ${rentalCount} rental record(s) in the system.`
+            };
+        }
+
         await sql`DELETE FROM clients WHERE id = ${id}`;
         revalidatePath('/clients');
         return { success: true, message: 'Client deleted successfully' };
@@ -428,7 +474,7 @@ export async function getRentals(): Promise<RentalWithDetails[]> {
     const rows = await sql`
         SELECT 
           r.*,
-          s.name as scooter_name,
+          s.name as scooter_name, s.image as scooter_image,
           c.full_name as client_name, c.phone as client_phone
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
@@ -443,7 +489,7 @@ export async function getActiveRentals(): Promise<RentalWithDetails[]> {
     const rows = await sql`
         SELECT 
           r.*,
-          s.name as scooter_name,
+          s.name as scooter_name, s.image as scooter_image,
           c.full_name as client_name, c.phone as client_phone
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
@@ -454,12 +500,28 @@ export async function getActiveRentals(): Promise<RentalWithDetails[]> {
     return mapRowsToRentalWithDetails(rows);
 }
 
+export async function getOverdueRentals(): Promise<RentalWithDetails[]> {
+    await requireAuth();
+    const rows = await sql`
+        SELECT 
+          r.*,
+          s.name as scooter_name, s.image as scooter_image,
+          c.full_name as client_name, c.phone as client_phone
+        FROM rentals r
+        JOIN scooters s ON r.scooter_id = s.id
+        JOIN clients c ON r.client_id = c.id
+        WHERE r.status = 'active' AND r.end_date < CURRENT_DATE
+        ORDER BY r.end_date ASC
+    `;
+    return mapRowsToRentalWithDetails(rows);
+}
+
 export async function getCompletedRentals(limit: number = 20): Promise<RentalWithDetails[]> {
     await requireAuth();
     const rows = await sql`
         SELECT 
           r.*,
-          s.name as scooter_name,
+          s.name as scooter_name, s.image as scooter_image,
           c.full_name as client_name, c.phone as client_phone
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
@@ -476,7 +538,7 @@ export async function getLatestRentals(limit: number = 5): Promise<RentalWithDet
     const rows = await sql`
         SELECT 
           r.*,
-          s.name as scooter_name,
+          s.name as scooter_name, s.image as scooter_image,
           c.full_name as client_name, c.phone as client_phone
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
@@ -505,6 +567,7 @@ function mapRowsToRentalWithDetails(rows: any[]): RentalWithDetails[] {
         scooter: {
             id: row.scooter_id.toString(),
             name: row.scooter_name,
+            image: row.scooter_image || '/placeholder.webp',
         } as any,
         client: {
             id: row.client_id.toString(),
@@ -529,25 +592,47 @@ export async function createRental(prevState: any, formData: FormData): Promise<
 
         const validatedClient = clientSchema.parse(clientData);
 
-        // 2. Client Upsert Logic
+        // 2. Client Resolution Logic
         const clients = await sql`
-            SELECT id FROM clients WHERE document_id = ${validatedClient.documentId}
+            SELECT id, full_name, phone FROM clients WHERE document_id = ${validatedClient.documentId}
         `;
 
         let clientId: string | number;
 
         if (clients.length > 0) {
-            clientId = clients[0].id;
-            await sql`
-                UPDATE clients 
-                SET full_name = ${validatedClient.fullName}, 
-                    phone = ${validatedClient.phone}, 
-                    has_deposit = ${validatedClient.hasDeposit}, 
-                    deposit_amount = ${validatedClient.depositAmount},
-                    updated_at = CURRENT_TIMESTAMP
-                WHERE id = ${clientId}
-            `;
+            const existingClient = clients[0];
+
+            // Conflict Check: detailed comparison to prevent accidental merges
+            const newName = validatedClient.fullName.trim().toLowerCase();
+            const existingName = existingClient.full_name.trim().toLowerCase();
+
+            // Allow minor case differences, but block completely different names
+            // If I type "Ahmed" and existing is "Ahmed T.", that might be okay? 
+            // Better to be strict: if names differ significantly, warn the user.
+            // For now, let's assume if the CIN matches, it SHOULD be the same person.
+            // If the names are different, the user likely made a typo in the CIN.
+            if (newName !== existingName) {
+                // Check Levenshtein distance or simple includes? 
+                // Let's stick to a strict check for safety as requested.
+                // But allow if the existing name contains the new name or vice versa 
+                // e.g. "Ahmed" vs "Ahmed Taouil"
+                if (!existingName.includes(newName) && !newName.includes(existingName)) {
+                    return {
+                        success: false,
+                        message: `Conflict detected: Document ID ${validatedClient.documentId} belongs to "${existingClient.full_name}". You entered "${validatedClient.fullName}". Please verify the Document ID.`
+                    };
+                }
+            }
+
+            clientId = existingClient.id;
+
+            // OPTIONAL: We could update the phone number if it changed, 
+            // but to be "safe" and avoid side effects, let's ONLY update if explicitly requested.
+            // The user wanted to prevent conflicts. Overwriting phone might be a conflict too.
+            // For now: We Link to the existing client. We DO NOT update them.
+
         } else {
+            // New Client - Insert safely
             const newClient = await sql`
                 INSERT INTO clients (full_name, document_id, phone, has_deposit, deposit_amount)
                 VALUES (${validatedClient.fullName}, ${validatedClient.documentId}, ${validatedClient.phone}, ${validatedClient.hasDeposit}, ${validatedClient.depositAmount})
@@ -583,18 +668,29 @@ export async function createRental(prevState: any, formData: FormData): Promise<
 
         // Security Check: Verify Scooter Availability
         const scooterCheck = await sql`
-            SELECT status, price FROM scooters WHERE id = ${validatedRental.scooterId}
+            SELECT status, price, quantity FROM scooters WHERE id = ${validatedRental.scooterId}
         `;
 
         if (scooterCheck.length === 0) {
             throw new Error('Selected asset does not exist.');
         }
 
-        // Revert strict check for testing or keep it? 
-        // "This asset is no longer available" might block if testing quickly.
-        // Keeping it for safety.
-        if (scooterCheck[0].status !== 'available') {
-            // throw new Error('This asset is no longer available for rent.');
+        const scooter = scooterCheck[0];
+        const quantity = Number(scooter.quantity || 1);
+
+        if (scooter.status === 'maintenance') {
+            return { success: false, message: 'This scooter is currently under maintenance.' };
+        }
+
+        // Count active rentals for this scooter
+        const activeRentals = await sql`
+            SELECT COUNT(*) as count FROM rentals 
+            WHERE scooter_id = ${validatedRental.scooterId} AND status = 'active'
+        `;
+        const activeCount = Number(activeRentals[0]?.count || 0);
+
+        if (activeCount >= quantity) {
+            return { success: false, message: `This scooter is out of stock (${activeCount}/${quantity} rented).` };
         }
 
         // 4. Commit Rental Record
@@ -626,10 +722,19 @@ export async function createRental(prevState: any, formData: FormData): Promise<
             `;
         }
 
-        // 5. Update Asset Status
-        await sql`
-            UPDATE scooters SET status = 'rented', updated_at = CURRENT_TIMESTAMP WHERE id = ${validatedRental.scooterId}
-        `;
+        // 5. Update Asset Status if full
+        if (activeCount + 1 >= quantity) {
+            await sql`
+                UPDATE scooters SET status = 'rented', updated_at = CURRENT_TIMESTAMP WHERE id = ${validatedRental.scooterId}
+            `;
+        } else {
+            // Ensure it's marked available if it wasn't
+            if (scooter.status === 'rented') {
+                await sql`
+                    UPDATE scooters SET status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = ${validatedRental.scooterId}
+                 `;
+            }
+        }
 
         // Synchronization
         revalidatePath('/dashboard/rentals');
@@ -656,14 +761,78 @@ export async function completeRental(id: string): Promise<ActionState> {
         `;
 
         if (rentalRows[0]) {
-            await sql`
-                UPDATE scooters SET status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = ${rentalRows[0].scooter_id}
-            `;
+            const scooterId = rentalRows[0].scooter_id;
+
+            // Check stock to see if we should make it available
+            const scooterInfo = await sql`SELECT quantity FROM scooters WHERE id = ${scooterId}`;
+            const activeRentals = await sql`SELECT COUNT(*) as count FROM rentals WHERE scooter_id = ${scooterId} AND status = 'active'`;
+
+            const quantity = Number(scooterInfo[0]?.quantity || 1);
+            const activeCount = Number(activeRentals[0]?.count || 0);
+
+            if (activeCount < quantity) {
+                await sql`
+                    UPDATE scooters SET status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = ${scooterId}
+                `;
+            }
         }
 
         revalidatePath('/rentals');
         revalidatePath('/scooters');
         return { success: true, message: 'Rental completed successfully' };
+    } catch (error) {
+        return handleActionError(error);
+    }
+}
+
+export async function revertRental(id: string): Promise<ActionState> {
+    await requireAuth();
+
+    try {
+        const rentalRows = await sql`SELECT scooter_id FROM rentals WHERE id = ${id}`;
+
+        if (!rentalRows[0]) {
+            throw new Error('Rental not found');
+        }
+
+        const scooterId = rentalRows[0].scooter_id;
+
+        // Check if scooter is currently available (logic: if it's rented to someone else, we can't revert)
+        // However, user asked to force update backend. 
+        // We should check if the scooter is currently 'available' or 'maintenance'. 
+        // If it is 'rented', we have a conflict.
+
+        const scooterCheck = await sql`SELECT status, quantity FROM scooters WHERE id = ${scooterId}`;
+        const quantity = Number(scooterCheck[0]?.quantity || 1);
+
+        // Count active rentals (excluding this one as it's not active yet)
+        const activeRentals = await sql`SELECT COUNT(*) as count FROM rentals WHERE scooter_id = ${scooterId} AND status = 'active'`;
+        const activeCount = Number(activeRentals[0]?.count || 0);
+
+        if (scooterCheck[0].status === 'maintenance') {
+            return { success: false, message: 'Cannot revert: Scooter is under maintenance.' };
+        }
+
+        if (activeCount >= quantity) {
+            return { success: false, message: `Cannot revert: Scooter is fully rented (${activeCount}/${quantity}).` };
+        }
+
+        await sql`
+            UPDATE rentals 
+            SET status = 'active', updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${id}
+        `;
+
+        // If now full, update status to rented
+        if (activeCount + 1 >= quantity) {
+            await sql`
+                UPDATE scooters SET status = 'rented', updated_at = CURRENT_TIMESTAMP WHERE id = ${scooterId}
+            `;
+        }
+
+        revalidatePath('/rentals');
+        revalidatePath('/scooters');
+        return { success: true, message: 'Rental reverted to active successfully' };
     } catch (error) {
         return handleActionError(error);
     }
@@ -746,7 +915,7 @@ export async function getRentalById(id: string): Promise<RentalWithDetails | nul
     const rows = await sql`
         SELECT 
           r.*,
-          s.name as scooter_name, s.plate as scooter_plate,
+          s.name as scooter_name, s.image as scooter_image,
           c.full_name as client_name, c.phone as client_phone, c.document_id as client_document_id
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
@@ -909,18 +1078,35 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 export async function getAnalyticsData(): Promise<AnalyticsData> {
     await requireAuth();
 
-    // 1. Monthly Revenue & Expenses (Last 6 Months)
+    // 1. Monthly Revenue & Expenses (Last 6 Months) - with mid-month points
     const monthlyStats = await sql`
+        WITH date_points AS (
+            SELECT (sm + (off || ' days')::interval)::date as d
+            FROM generate_series('2026-01-01'::date, date_trunc('month', CURRENT_DATE), '1 month'::interval) sm
+            CROSS JOIN (VALUES (0), (14)) AS offsets(off)
+            WHERE (sm + (off || ' days')::interval) <= CURRENT_DATE
+        )
         SELECT 
-            TO_CHAR(date_trunc('month', d)::date, 'Mon') as month_label,
-            date_trunc('month', d)::date as raw_date,
-            (SELECT COALESCE(SUM(total_price), 0) FROM rentals WHERE date_trunc('month', created_at) = date_trunc('month', d)) as revenue,
-            (SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE date_trunc('month', date) = date_trunc('month', d)) as expenses
-        FROM generate_series(
-            '2025-12-01'::date,
-            date_trunc('month', CURRENT_DATE),
-            '1 month'::interval
-        ) d
+            CASE 
+                WHEN EXTRACT(DAY FROM d) = 1 THEN TO_CHAR(d, 'Mon')
+                ELSE TO_CHAR(d, 'Mon') || ' 15'
+            END as month_label,
+            d as raw_date,
+            (SELECT COALESCE(SUM(total_price), 0) FROM rentals 
+             WHERE created_at >= d AND created_at < (
+                 CASE 
+                    WHEN EXTRACT(DAY FROM d) = 1 THEN d + INTERVAL '14 days'
+                    ELSE date_trunc('month', d) + INTERVAL '1 month'
+                 END
+             )) as revenue,
+            (SELECT COALESCE(SUM(amount), 0) FROM expenses 
+             WHERE date >= d AND date < (
+                 CASE 
+                    WHEN EXTRACT(DAY FROM d) = 1 THEN d + INTERVAL '14 days'
+                    ELSE date_trunc('month', d) + INTERVAL '1 month'
+                 END
+             )) as expenses
+        FROM date_points
         ORDER BY raw_date ASC
     `;
 
@@ -928,12 +1114,13 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
     const topScooters = await sql`
         SELECT 
             s.id, 
-            s.name, 
+            s.name,
+            s.image, 
             COUNT(r.id) as trips,
             COALESCE(SUM(r.total_price), 0) as revenue
         FROM scooters s
         JOIN rentals r ON r.scooter_id = s.id
-        GROUP BY s.id
+        GROUP BY s.id, s.name, s.image
         ORDER BY revenue DESC
         LIMIT 5
     `;
@@ -946,38 +1133,40 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
     const utilization = Number(activeRentals[0].count) / (Number(totalScooters[0].count) || 1);
 
     if (utilization < 0.3) {
-        tips.push("Utilization is low (< 30%). Consider creating a weekend discount promo.");
+        tips.push("Only 30% of your scooters are rented right now. Try offering weekend discounts to attract more customers.");
     } else if (utilization > 0.8) {
-        tips.push("High demand! Your fleet is over 80% rented. Consider acquiring more scooters.");
+        tips.push("Great news! Over 80% of your scooters are rented. You might want to buy more scooters to meet demand.");
     }
 
     const currentMonthRevenue = Number(monthlyStats[monthlyStats.length - 1]?.revenue || 0);
     const lastMonthRevenue = Number(monthlyStats[monthlyStats.length - 2]?.revenue || 0);
 
     if (currentMonthRevenue > lastMonthRevenue * 1.2 && lastMonthRevenue > 0) {
-        tips.push("Great job! Revenue is up 20% compared to last month.");
+        tips.push("Excellent work! Your revenue went up 20% this month compared to last month.");
     } else if (currentMonthRevenue < lastMonthRevenue * 0.8 && lastMonthRevenue > 0) {
-        tips.push("Revenue is down 20%. Check if you need to increase marketing.");
+        tips.push("Your revenue dropped 20% this month. Consider boosting your marketing or offering promotions.");
     }
 
     const currentMonthExpenses = Number(monthlyStats[monthlyStats.length - 1]?.expenses || 0);
     if (currentMonthExpenses > currentMonthRevenue * 0.5) {
-        tips.push("Warning: Expenses are eating up more than 50% of your revenue this month.");
+        tips.push("Watch out! Your expenses are taking up more than half of your revenue this month. Look for ways to cut costs.");
     }
 
     if (tips.length === 0) {
-        tips.push("Operations are running smoothly. Keep up the good work!");
+        tips.push("Everything looks good! Your business is running smoothly. Keep it up!");
     }
 
     return {
         monthlyStats: monthlyStats.map((row: any) => ({
             month: row.month_label,
             revenue: Number(row.revenue),
-            expenses: Number(row.expenses)
+            expenses: Number(row.expenses),
+            profit: Number(row.revenue) - Number(row.expenses)
         })),
         topScooters: topScooters.map((row: any) => ({
             id: row.id.toString(),
             name: row.name,
+            image: row.image,
             revenue: Number(row.revenue),
             trips: Number(row.trips)
         })),
@@ -1172,5 +1361,114 @@ export async function logout() {
     } catch (error) {
         console.error('Logout error:', error);
         throw error;
+    }
+}
+
+// ==================== USER SETTINGS ACTIONS ====================
+
+import bcrypt from 'bcryptjs';
+
+export async function getCurrentUser(): Promise<{ id: string; username: string } | null> {
+    try {
+        const user = await requireAuth();
+        if (!user?.userId) return null;
+
+        const rows = await sql`
+            SELECT id, username FROM admin_users WHERE id = ${parseInt(user.userId)}
+        `;
+
+        if (rows.length === 0) return null;
+        return { id: String(rows[0].id), username: rows[0].username as string };
+    } catch (error) {
+        console.error('Get current user error:', error);
+        return null;
+    }
+}
+
+export async function updateUsername(newUsername: string): Promise<ActionState> {
+    try {
+        const user = await requireAuth();
+        if (!user?.userId) {
+            return { success: false, message: 'Not authenticated' };
+        }
+
+        // Validate username
+        const trimmedUsername = newUsername.trim();
+        if (trimmedUsername.length < 3) {
+            return { success: false, message: 'Username must be at least 3 characters' };
+        }
+        if (trimmedUsername.length > 50) {
+            return { success: false, message: 'Username must be less than 50 characters' };
+        }
+        if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
+            return { success: false, message: 'Username can only contain letters, numbers, and underscores' };
+        }
+
+        // Check if username is already taken
+        const existingUsers = await sql`
+            SELECT id FROM admin_users WHERE username = ${trimmedUsername} AND id != ${parseInt(user.userId)}
+        `;
+        if (existingUsers.length > 0) {
+            return { success: false, message: 'Username is already taken' };
+        }
+
+        // Update username
+        await sql`
+            UPDATE admin_users 
+            SET username = ${trimmedUsername}
+            WHERE id = ${parseInt(user.userId)}
+        `;
+
+        revalidatePath('/dashboard/settings');
+        return { success: true, message: 'Username updated successfully. Please log out and log back in for changes to take effect.' };
+    } catch (error) {
+        return handleActionError(error);
+    }
+}
+
+export async function updatePassword(currentPassword: string, newPassword: string): Promise<ActionState> {
+    try {
+        const user = await requireAuth();
+        if (!user?.userId) {
+            return { success: false, message: 'Not authenticated' };
+        }
+
+        // Validate new password
+        if (newPassword.length < 4) {
+            return { success: false, message: 'New password must be at least 4 characters' };
+        }
+        if (newPassword.length > 100) {
+            return { success: false, message: 'Password is too long' };
+        }
+
+        // Get current password hash
+        const users = await sql`
+            SELECT password_hash FROM admin_users WHERE id = ${parseInt(user.userId)}
+        `;
+        if (users.length === 0) {
+            return { success: false, message: 'User not found' };
+        }
+
+        // Verify current password
+        const passwordValid = await bcrypt.compare(currentPassword, users[0].password_hash as string);
+        if (!passwordValid) {
+            return { success: false, message: 'Current password is incorrect' };
+        }
+
+        // Hash new password
+        const saltRounds = 10;
+        const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+
+        // Update password
+        await sql`
+            UPDATE admin_users 
+            SET password_hash = ${newPasswordHash}
+            WHERE id = ${parseInt(user.userId)}
+        `;
+
+        revalidatePath('/dashboard/settings');
+        return { success: true, message: 'Password updated successfully' };
+    } catch (error) {
+        return handleActionError(error);
     }
 }

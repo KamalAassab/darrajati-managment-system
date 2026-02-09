@@ -4,28 +4,36 @@ import { Lightbulb, Sparkles } from 'lucide-react';
 
 export default function SmartTips({ tips }: { tips: string[] }) {
     return (
-        <div className="glass-panel-dark rounded-3xl p-6 h-full border-orange/10 relative overflow-hidden group">
-            {/* Background Decor */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange/10 rounded-full blur-3xl group-hover:bg-orange/15 transition-all duration-700" />
-
-            <div className="flex items-center gap-3 mb-6 relative z-10">
-                <Sparkles className="w-6 h-6 text-orange animate-pulse" />
-                <h3 className="text-2xl font-outfit font-black tracking-wide text-white uppercase font-normal">AI Insights</h3>
+        <div className="glass-panel rounded-3xl p-4 md:p-6 border-white/[0.03] hover:border-white/[0.08] transition-all duration-500 h-full">
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4">
+                <Sparkles className="w-5 h-5 text-orange" />
+                <h3 className="text-xl md:text-2xl text-white uppercase font-bold">AI Insights</h3>
             </div>
 
-            <div className="space-y-4 relative z-10">
+            {/* Tips List */}
+            <div className="space-y-2.5">
                 {tips.map((tip, index) => (
-                    <div key={index} className="flex gap-4 p-4 rounded-2xl bg-gradient-to-r from-white/[0.03] to-transparent border-l-4 border-orange/50 hover:border-orange transition-all">
-                        <Lightbulb className="w-6 h-6 text-orange/80 shrink-0 mt-0.5" />
-                        <p className="text-sm font-bold text-white/90 leading-relaxed">
-                            {tip}
-                        </p>
+                    <div
+                        key={index}
+                        className="group/tip relative overflow-hidden rounded-xl bg-white/[0.02] border border-white/5 hover:border-orange/20 p-3 transition-all duration-300"
+                    >
+                        {/* Hover Effect */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-orange/0 via-orange/5 to-orange/0 translate-x-[-100%] group-hover/tip:translate-x-[100%] transition-transform duration-1000" />
+
+                        {/* Content */}
+                        <div className="relative z-10 flex gap-3">
+                            <Lightbulb className="w-4 h-4 text-orange shrink-0" />
+                            <p className="text-xs md:text-sm text-white/80 leading-relaxed">
+                                {tip}
+                            </p>
+                        </div>
                     </div>
                 ))}
 
                 {tips.length === 0 && (
-                    <div className="text-center py-10 text-white/20 uppercase tracking-widest text-xs font-bold">
-                        Gathering more data...
+                    <div className="text-center py-8 text-white/20 uppercase tracking-widest text-xs font-bold">
+                        Analyzing Data...
                     </div>
                 )}
             </div>

@@ -57,21 +57,18 @@ export function RentalStats({ activeRentals, completedRentals }: RentalStatsProp
     ];
 
     return (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
             {stats.map((stat, index) => (
-                <div key={index} className={`glass-panel p-5 rounded-2xl border ${stat.border} relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300`}>
+                <div key={index} className="glass-panel p-5 rounded-2xl border border-white/5 relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div className={`absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity ${stat.color}`}>
                         <stat.icon className="w-16 h-16" />
                     </div>
 
-                    <div className="relative z-10 flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl ${stat.bg} ${stat.color} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform`}>
-                            <stat.icon className="w-6 h-6" />
-                        </div>
-
-                        <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-0.5">{stat.label}</p>
-                            <h3 className="text-2xl font-anton text-white tracking-wide">{stat.value}</h3>
+                    <div className="relative z-10">
+                        <p className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">{stat.label}</p>
+                        <div className="flex items-center gap-2 md:gap-3">
+                            <stat.icon className={`w-6 h-6 md:w-7 md:h-7 ${stat.color} shrink-0 group-hover:scale-110 transition-transform`} />
+                            <h3 className="text-xl md:text-2xl font-anton text-white tracking-wide leading-none">{stat.value}</h3>
                         </div>
                     </div>
                 </div>

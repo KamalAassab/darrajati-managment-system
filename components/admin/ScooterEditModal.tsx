@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Scooter } from '@/types/admin';
 import { updateScooter } from '@/app/actions';
 import { X, Save, Bike, Settings2 } from 'lucide-react';
-import { useLanguage } from '@/lib/contexts/LanguageContext';
 
 interface ScooterEditModalProps {
     scooter: Scooter;
@@ -13,8 +12,6 @@ interface ScooterEditModalProps {
 }
 
 export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalProps) {
-    const { t } = useLanguage();
-
     // Helper to extract numbers from potential string values (e.g. "150cc" -> "150")
     const extractNumber = (val: string | number | undefined) => {
         if (val === undefined || val === null) return '';
@@ -53,7 +50,7 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
                 <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-white/5 bg-[#0a0a0a]/95 backdrop-blur">
                     <h2 className="text-xl font-anton uppercase tracking-wide text-white flex items-center gap-3">
                         <Settings2 className="w-5 h-5 text-orange" />
-                        {t('edit')} {scooter.name}
+                        Edit {scooter.name}
                     </h2>
                     <button onClick={onClose} className="p-2 text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/5">
                         <X className="w-5 h-5" />
@@ -67,18 +64,23 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
                             <h3 className="text-xs font-bold uppercase tracking-widest text-orange mb-2">Basic Info</h3>
 
                             <div>
-                                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">{t('scooterName')}</label>
+                                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Scooter Name</label>
                                 <input name="name" defaultValue={scooter.name} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors" />
                             </div>
 
 
 
                             <div>
-                                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">{t('dailyPrice')}</label>
+                                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Daily Price</label>
                                 <div className="relative">
                                     <input name="price" type="number" min="0" defaultValue={extractNumber(scooter.price)} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors pr-12 appearance-none hide-number-spinner" />
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-white/30 pointer-events-none">MAD</span>
                                 </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Quantity</label>
+                                <input name="quantity" type="number" min="1" defaultValue={scooter.quantity || 1} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors appearance-none hide-number-spinner" />
                             </div>
 
                             <div>

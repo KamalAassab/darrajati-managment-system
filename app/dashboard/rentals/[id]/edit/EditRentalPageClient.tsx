@@ -86,7 +86,7 @@ export default function EditRentalPageClient({
             <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Read-Only Client Info */}
                 <div className="glass-panel rounded-2xl p-8 border-white/[0.03] opacity-60 pointer-events-none">
-                    <h2 className="text-xl font-bold tracking-tight text-white uppercase mb-8 border-b border-white/5 pb-4">Client Information (Locked)</h2>
+                    <h2 className="text-xl font-bold text-white uppercase mb-8 border-b border-white/5 pb-4">Client Information (Locked)</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-2">
                             <label className="text-xs font-medium uppercase tracking-widest text-white/40 ml-1">Full Name</label>
@@ -101,7 +101,7 @@ export default function EditRentalPageClient({
 
                 {/* Editable Logistics */}
                 <div className="glass-panel rounded-2xl p-8 border-white/[0.03]">
-                    <h2 className="text-xl font-bold tracking-tight text-white uppercase mb-8 border-b border-white/5 pb-4">Rental Logistics</h2>
+                    <h2 className="text-xl font-bold text-white uppercase mb-8 border-b border-white/5 pb-4">Rental Logistics</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-2">

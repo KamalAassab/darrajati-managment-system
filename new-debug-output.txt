@@ -1,0 +1,13 @@
+=== DEBUGGING USER "admin" WITH PASSWORD "soufiane0000" ===
+
+All Users in DB: [ { id: 4, username: 'admin' } ]
+
+Ô£ô User found:
+  ID: 4
+  Username: admin
+  Stored Hash: $2b$10$SMQVr1/2I7ryPQW7gJuSf.ZAz30y.Ia9AGuis.FxL/fySu9eIlMei
+
+Testing password "soufiane0000" against stored hash...
+Result: VALID Ô£ô
+
+Conclusion: The user updated their password successfully, but their username is STILL "admin".

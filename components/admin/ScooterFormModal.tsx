@@ -6,6 +6,7 @@ import { Scooter } from '@/types/admin';
 import { X, Upload, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { CustomSelect } from './CustomSelect';
 
 interface ScooterFormModalProps {
     isOpen: boolean;
@@ -21,11 +22,13 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
     const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [status, setStatus] = useState<string>('available');
 
     // Reset form when modal opens/closes or scooter changes
     useEffect(() => {
         if (isOpen) {
             setImagePreview(scooter?.image || null);
+            setStatus(scooter?.status || 'available');
             setError(null);
             setFieldErrors({});
         }
@@ -39,6 +42,10 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
 
         try {
             const formData = new FormData(e.currentTarget);
+            // Ensure status is in formData (CustomSelect includes hidden input, so it should be fine)
+            // But to be safe with CustomSelect's hidden input
+            // CustomSelect renders: <input type="hidden" name={name} value={value} />
+            // So formData.get('status') will work.
 
             let result;
             if (isEdit && scooter) {
@@ -53,7 +60,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
             } else {
                 if (result.fieldErrors) {
                     setFieldErrors(result.fieldErrors);
-                    setError('Please fix the validation errors below');
+                    setError('Please fix the validation errors');
                 } else {
                     setError(result.message || 'An error occurred');
                 }
@@ -132,7 +139,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 ) : (
                                     <div className="flex flex-col items-center justify-center h-full text-white/40 group-hover:text-orange/70 transition-colors">
                                         <Upload className="w-12 h-12 mb-2" />
-                                        <span className="text-sm font-semibold">Click to upload image</span>
+                                        <span className="text-sm font-semibold">Click to upload</span>
                                     </div>
                                 )}
                             </label>
@@ -143,7 +150,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-white uppercase tracking-wider">
-                                Name *
+                                Scooter Name *
                             </label>
                             <input
                                 type="text"
@@ -151,7 +158,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 defaultValue={scooter?.name}
                                 required
                                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
-                                placeholder="e.g., Honda PCX 125"
+                                placeholder="Scooter Name"
                             />
                         </div>
 
@@ -199,16 +206,32 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
 
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-white uppercase tracking-wider">
+                                Quantity *
+                            </label>
+                            <input
+                                type="number"
+                                name="quantity"
+                                defaultValue={scooter?.quantity || 1}
+                                min="1"
+                                required
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                placeholder="1"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-white uppercase tracking-wider">
                                 Status
                             </label>
-                            <select
+                            <CustomSelect
                                 name="status"
-                                defaultValue={scooter?.status || 'available'}
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange/50"
-                            >
-                                <option value="available" className="bg-black">Available</option>
-                                <option value="maintenance" className="bg-black">Maintenance</option>
-                            </select>
+                                value={status}
+                                onChange={setStatus}
+                                options={[
+                                    { value: 'available', label: 'Available', color: 'text-green-500' },
+                                    { value: 'maintenance', label: 'Maintenance', color: 'text-red-500' }
+                                ]}
+                            />
                         </div>
                     </div>
 

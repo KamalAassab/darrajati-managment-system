@@ -1,26 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createExpense, updateExpense, deleteExpense } from '@/app/actions';
 import { formatMAD } from '@/lib/utils/currency';
 import { Plus, TrendingDown, DollarSign, PieChart, Calendar, X, History, Trash2, Edit } from 'lucide-react';
 import { Expense, DashboardStats } from '@/types/admin';
-import { useLanguage } from '@/lib/contexts/LanguageContext';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
+import { CustomSelect } from '@/components/admin/CustomSelect';
 
 interface FinancesPageClientProps {
     expenses: Expense[];
     dashboardStats: DashboardStats;
 }
 
+// Category labels for display
+const categoryLabels: Record<string, string> = {
+    maintenance: 'Maintenance',
+    fuel: 'Fuel',
+    advertising: 'Advertising',
+    salaries: 'Salaries',
+    rent: 'Rent',
+    assurance: 'Assurance',
+    new_scooter: 'New Scooter',
+    wifi: 'Wifi',
+    electricity_water: 'Electricity & Water',
+    other: 'Other',
+};
+
 export default function FinancesPageClient({ expenses, dashboardStats }: FinancesPageClientProps) {
-    const { t } = useLanguage();
     const [showForm, setShowForm] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editFormData, setEditFormData] = useState<Expense | null>(null);
-
+    const [category, setCategory] = useState('');
 
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -42,15 +55,23 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
         return acc;
     }, {});
 
+    useEffect(() => {
+        if (showForm) {
+            setCategory(editFormData?.category || '');
+        }
+    }, [showForm, editFormData]);
+
     const handleOpenCreate = () => {
         setEditingId(null);
         setEditFormData(null);
+        setCategory('');
         setShowForm(true);
     };
 
     const handleOpenEdit = (expense: Expense) => {
         setEditingId(expense.id);
         setEditFormData(expense);
+        setCategory(expense.category);
         setShowForm(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -97,6 +118,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
             setShowForm(false);
             setEditingId(null);
             setEditFormData(null);
+            setCategory('');
         } else {
             setConfirmModal({
                 isOpen: true,
@@ -127,48 +149,53 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
         });
     };
 
+    const categoryOptions = Object.entries(categoryLabels).map(([key, label]) => ({
+        value: key,
+        label: label,
+        color: 'text-white'
+    }));
+
     return (
         <div className="space-y-10 font-inter pb-10">
 
             <div className="flex justify-between items-end">
                 <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-orange text-glow-orange mb-2">{t('finances')}</p>
-                    <h1 className="text-4xl font-outfit font-black tracking-tighter text-white uppercase flex items-center gap-3">
-                        <DollarSign className="w-8 h-8 text-orange" />
-                        {t('finances')}
+                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3">
+                        <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-orange" />
+                        Finances
                     </h1>
                 </div>
                 <button
                     onClick={() => showForm ? setShowForm(false) : handleOpenCreate()}
-                    className="bg-orange text-white px-6 py-3 rounded-2xl flex items-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer"
+                    className="bg-orange text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
                 >
-                    <Plus className={`w-5 h-5 transition-transform duration-300 ${showForm ? 'rotate-45' : ''}`} />
-                    {showForm ? t('cancel') : t('addExpense')}
+                    <Plus className={`w-6 h-6 md:w-5 md:h-5 transition-transform duration-300 ${showForm ? 'rotate-45' : ''}`} />
+                    <span className="hidden md:inline">{showForm ? 'Cancel' : 'Add Expense'}</span>
                 </button>
             </div>
 
             {/* Financial Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="glass-panel rounded-3xl p-8 relative overflow-hidden group">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
+                <div className="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-8 relative overflow-hidden group col-span-2 md:col-span-1">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 blur-3xl rounded-full" />
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-2">{t('totalRevenue')}</p>
-                    <p className="text-4xl font-outfit font-black text-green-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
+                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1 md:mb-2">Total Revenue</p>
+                    <p className="text-2xl md:text-4xl font-outfit font-black text-green-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
                         {formatMAD(dashboardStats.totalRevenue)}
                     </p>
                 </div>
 
-                <div className="glass-panel rounded-3xl p-8 relative overflow-hidden group">
+                <div className="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-8 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 blur-3xl rounded-full" />
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-2">{t('totalExpenses')}</p>
-                    <p className="text-4xl font-outfit font-black text-red-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
+                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1 md:mb-2">Total Expenses</p>
+                    <p className="text-xl md:text-4xl font-outfit font-black text-red-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
                         {formatMAD(dashboardStats.totalExpenses)}
                     </p>
                 </div>
 
-                <div className="glass-panel rounded-3xl p-8 relative overflow-hidden group orange-glow-border">
+                <div className="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-8 relative overflow-hidden group orange-glow-border">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-orange/5 blur-3xl rounded-full" />
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-2">{t('netProfit')}</p>
-                    <p className={`text-4xl font-outfit font-black tracking-tight group-hover:scale-110 origin-left transition-transform duration-500 ${dashboardStats.netProfit >= 0 ? 'text-orange text-glow-orange' : 'text-red-500'
+                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1 md:mb-2">Net Profit</p>
+                    <p className={`text-xl md:text-4xl font-outfit font-black tracking-tight group-hover:scale-110 origin-left transition-transform duration-500 ${dashboardStats.netProfit >= 0 ? 'text-orange text-glow-orange' : 'text-red-500'
                         }`}>
                         {formatMAD(dashboardStats.netProfit)}
                     </p>
@@ -179,8 +206,8 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
             {showForm && (
                 <div className="glass-panel rounded-3xl p-8 orange-glow-border animate-in fade-in slide-in-from-top-4 duration-500">
                     <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-2xl font-outfit font-black tracking-tighter text-white uppercase">
-                            {editingId ? 'Edit Expense' : 'Add New Expense'}
+                        <h2 className="text-2xl text-white uppercase">
+                            {editingId ? 'Edit Expense' : 'Add Expense'}
                         </h2>
                         <button onClick={() => setShowForm(false)} className="text-white/20 hover:text-white transition-colors cursor-pointer">
                             <X className="w-6 h-6" />
@@ -191,23 +218,14 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Category</label>
-                                <div className="relative">
-                                    <select
-                                        name="category"
-                                        required
-                                        defaultValue={editFormData?.category || ""}
-                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all appearance-none cursor-pointer"
-                                    >
-                                        <option value="" className="bg-black">Select Category...</option>
-                                        <option value="maintenance" className="bg-black">Maintenance</option>
-                                        <option value="fuel" className="bg-black">Fuel</option>
-                                        <option value="advertising" className="bg-black">Advertising</option>
-                                        <option value="salary" className="bg-black">Salaries</option>
-                                        <option value="rent" className="bg-black">Rent</option>
-                                        <option value="insurance" className="bg-black">Insurance</option>
-                                        <option value="other" className="bg-black">Other</option>
-                                    </select>
-                                </div>
+                                <CustomSelect
+                                    name="category"
+                                    value={category}
+                                    onChange={setCategory}
+                                    options={categoryOptions}
+                                    placeholder="Select Category"
+                                    required
+                                />
                             </div>
 
                             <div className="space-y-2">
@@ -220,7 +238,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                         step="0.01"
                                         min="0"
                                         defaultValue={editFormData?.amount}
-                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all font-mono"
+                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all font-mono"
                                         placeholder="0.00"
                                     />
                                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white/20 uppercase tracking-widest">MAD</span>
@@ -234,7 +252,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                     name="date"
                                     required
                                     defaultValue={editFormData?.date}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all cursor-pointer"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all cursor-pointer"
                                 />
                             </div>
 
@@ -245,8 +263,8 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                     required
                                     rows={2}
                                     defaultValue={editFormData?.description}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all resize-none placeholder:text-white/20"
-                                    placeholder="Enter details..."
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all resize-none placeholder:text-white/20"
+                                    placeholder="Enter details about this expense..."
                                 />
                             </div>
                         </div>
@@ -255,7 +273,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex-1 bg-orange text-white font-bold py-4 rounded-2xl hover:bg-orange/90 transition-all duration-300 orange-glow uppercase tracking-wide disabled:opacity-50 disabled:cursor-wait"
+                                className="flex-1 bg-orange text-white font-bold py-4 rounded-xl hover:bg-orange/90 transition-all duration-300 orange-glow uppercase tracking-wide disabled:opacity-50 disabled:cursor-wait"
                             >
                                 {isSubmitting ? 'Saving...' : (editingId ? 'Update Expense' : 'Save Expense')}
                             </button>
@@ -280,7 +298,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                 <div className="lg:col-span-1 space-y-6">
                     <div className="flex items-center gap-3">
                         <PieChart className="w-5 h-5 text-red-500" />
-                        <h2 className="text-2xl font-outfit font-black tracking-tighter text-white uppercase">Expenses by Category</h2>
+                        <h2 className="text-2xl text-white uppercase">Expenses by Category</h2>
                     </div>
 
                     <div className="glass-panel rounded-3xl p-6 space-y-4">
@@ -289,13 +307,13 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                 <div key={category} className="p-4 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/[0.08] transition-all flex items-center justify-between group">
                                     <div className="flex items-center gap-3">
                                         <div className="w-1.5 h-1.5 rounded-full bg-red-500/50 group-hover:bg-red-500 transition-colors" />
-                                        <p className="text-xs font-bold text-white/60 uppercase tracking-widest capitalize">{category}</p>
+                                        <p className="text-xs font-bold text-white/60 uppercase tracking-widest capitalize">{categoryLabels[category] || category}</p>
                                     </div>
                                     <p className="text-lg font-outfit font-black text-white tracking-tight">{formatMAD(amount)}</p>
                                 </div>
                             ))
                         ) : (
-                            <div className="text-center py-8 text-white/20 text-xs uppercase tracking-widest">No data available</div>
+                            <div className="text-center py-8 text-white/20 text-xs uppercase tracking-widest">No Data</div>
                         )}
                     </div>
                 </div>
@@ -304,11 +322,12 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                 <div className="lg:col-span-2 space-y-6">
                     <div className="flex items-center gap-3">
                         <History className="w-6 h-6 text-white/20" />
-                        <h2 className="text-2xl font-outfit font-black tracking-tighter text-white uppercase">Recent Expenses</h2>
+                        <h2 className="text-2xl text-white uppercase">Recent Expenses</h2>
                     </div>
 
                     <div className="glass-panel rounded-3xl overflow-hidden relative">
-                        <div className="overflow-x-auto admin-scrollbar">
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto admin-scrollbar">
                             <table className="w-full">
                                 <thead>
                                     <tr className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30 border-b border-white/5">
@@ -330,7 +349,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                             </td>
                                             <td className="py-5 px-6">
                                                 <span className="px-3 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-[9px] font-bold uppercase tracking-widest">
-                                                    {expense.category}
+                                                    {categoryLabels[expense.category] || expense.category}
                                                 </span>
                                             </td>
                                             <td className="py-5 px-6 text-sm text-white/50 italic max-w-[200px] truncate" title={expense.description}>
@@ -342,14 +361,14 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                                     <button
                                                         onClick={() => handleOpenEdit(expense)}
                                                         className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-colors"
-                                                        title="Edit Expense"
+                                                        title="Edit"
                                                     >
                                                         <Edit className="w-3.5 h-3.5" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDelete(expense.id)}
                                                         className="p-2 bg-red-500/10 hover:bg-red-500/20 rounded-lg text-red-500 transition-colors"
-                                                        title="Delete Expense"
+                                                        title="Delete"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
                                                     </button>
@@ -361,11 +380,52 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                             </table>
                         </div>
 
+                        {/* Mobile Card View */}
+                        <div className="md:hidden space-y-4 p-4">
+                            {expenses.slice(0, 10).map((expense) => (
+                                <div key={expense.id} className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 space-y-3">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-2">
+                                            <span className="px-2 py-1 bg-red-500/10 border border-red-500/20 text-red-500 rounded-md text-[9px] font-bold uppercase tracking-widest">
+                                                {categoryLabels[expense.category] || expense.category}
+                                            </span>
+                                            <div className="flex items-center gap-1.5 text-white/30">
+                                                <Calendar className="w-3 h-3" />
+                                                <span className="text-[10px] font-mono font-bold">{expense.date}</span>
+                                            </div>
+                                        </div>
+                                        <span className="font-outfit font-black text-red-500 tracking-tight text-lg">
+                                            {formatMAD(expense.amount)}
+                                        </span>
+                                    </div>
+
+                                    <p className="text-sm text-white/60 italic leading-snug">
+                                        {expense.description}
+                                    </p>
+
+                                    <div className="flex justify-end gap-3 pt-3 border-t border-white/5">
+                                        <button
+                                            onClick={() => handleOpenEdit(expense)}
+                                            className="flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg text-[10px] font-bold uppercase tracking-widest text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+                                        >
+                                            <Edit className="w-3 h-3" /> Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(expense.id)}
+                                            className="flex items-center gap-2 px-3 py-1.5 bg-red-500/10 rounded-lg text-[10px] font-bold uppercase tracking-widest text-red-500 hover:bg-red-500/20 transition-colors"
+                                        >
+                                            <Trash2 className="w-3 h-3" /> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
                         {expenses.length === 0 && (
                             <div className="text-center py-24">
                                 <TrendingDown className="w-12 h-12 text-white/10 mx-auto mb-4" />
-                                <h3 className="text-xl font-outfit font-black tracking-tighter text-white uppercase">No Expenses Found</h3>
-                                <p className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">Add your first expense to see analytics</p>
+                                <h3 className="text-xl text-white uppercase">No Expenses</h3>
+                                <p className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">Add your first expense to get started</p>
                             </div>
                         )}
                     </div>

@@ -5,7 +5,7 @@ import { Rental, RentalPayment } from '@/types/admin';
 import { addRentalPayment, getRentalPayments, deleteRentalPayment } from '@/app/actions';
 import { X, Plus, Trash2, DollarSign, Calendar, FileText, Loader2 } from 'lucide-react';
 import { formatMAD } from '@/lib/utils/currency';
-import { useLanguage } from '@/lib/contexts/LanguageContext';
+
 
 interface RentalPaymentsModalProps {
     isOpen: boolean;
@@ -14,7 +14,7 @@ interface RentalPaymentsModalProps {
 }
 
 export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsModalProps) {
-    const { t } = useLanguage();
+
     const [payments, setPayments] = useState<RentalPayment[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,7 +116,7 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
 
                 {/* Summary Card */}
                 <div className="p-6 bg-white/5 border-b border-white/5">
-                    <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                         <div className="bg-black/40 p-3 rounded-xl border border-white/5">
                             <span className="text-[10px] uppercase text-white/40 font-bold block mb-1">Total Price</span>
                             <span className="text-lg font-bold text-white">{formatMAD(rental.totalPrice)}</span>

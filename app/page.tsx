@@ -13,7 +13,7 @@ function LoginButton() {
         <button
             type="submit"
             disabled={pending}
-            className="w-full bg-orange text-white font-bold py-4 rounded-2xl hover:bg-orange/90 transition-all duration-300 orange-glow active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-lg tracking-tight"
+            className="w-full bg-orange text-white font-bold py-3 sm:py-4 rounded-2xl hover:bg-orange/90 transition-all duration-300 orange-glow active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-base sm:text-lg tracking-tight"
         >
             {pending ? (
                 <>
@@ -51,24 +51,24 @@ function LoginForm() {
     }, [formState, router]);
 
     return (
-        <div className="w-full max-w-md relative z-10 px-4">
-            <div className="glass-panel-dark rounded-3xl p-8 md:p-10 orange-glow-border">
-                <div className="flex justify-center mb-6">
-                    <div className="w-16 h-16 bg-orange rounded-2xl flex items-center justify-center orange-glow">
-                        <ShieldCheck className="w-10 h-10 text-white" />
+        <div className="w-full max-w-md relative z-10 px-4 sm:px-6 md:px-0">
+            <div className="glass-panel-dark rounded-3xl p-6 sm:p-8 md:p-10 orange-glow-border">
+                <div className="flex justify-center mb-6 sm:mb-8">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-orange rounded-2xl flex items-center justify-center orange-glow transition-all duration-300">
+                        <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
                     </div>
                 </div>
 
-                <div className="text-center mb-10">
-                    <h1 className="text-4xl font-outfit tracking-tighter text-white mb-2 uppercase italic text-glow-orange font-bold">
+                <div className="text-center mb-6 sm:mb-8 md:mb-10">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-outfit tracking-tighter text-white mb-2 uppercase italic text-glow-orange font-bold transition-all duration-300">
                         Darrajati <span className="text-orange">Admin</span>
                     </h1>
-                    <p className="text-muted-foreground text-sm tracking-widest uppercase font-inter font-medium opacity-60">
+                    <p className="text-muted-foreground text-xs md:text-sm tracking-widest uppercase font-inter font-medium opacity-60">
                         Security Gateway
                     </p>
                 </div>
 
-                <form action={dispatch} className="space-y-6">
+                <form action={dispatch} className="space-y-5 sm:space-y-6">
                     {uiError && (
                         <div className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-3 rounded-xl text-sm text-center animate-pulse">
                             {uiError}
@@ -88,7 +88,7 @@ function LoginForm() {
                                 id="username"
                                 name="username"
                                 required
-                                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-orange/50 focus:border-orange/50 outline-none transition-all duration-300"
+                                className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-orange/50 focus:border-orange/50 outline-none transition-all duration-300"
                                 placeholder="Enter username"
                                 onChange={() => setUiError(null)}
                             />
@@ -108,7 +108,7 @@ function LoginForm() {
                                 id="password"
                                 name="password"
                                 required
-                                className="w-full pl-12 pr-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-orange/50 focus:border-orange/50 outline-none transition-all duration-300"
+                                className="w-full pl-12 pr-12 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-orange/50 focus:border-orange/50 outline-none transition-all duration-300"
                                 placeholder="••••••••"
                                 onChange={() => setUiError(null)}
                             />
@@ -129,8 +129,8 @@ function LoginForm() {
                     <LoginButton />
                 </form>
 
-                <p className="text-center text-xs text-white/30 mt-8 tracking-tighter uppercase font-medium">
-                    System encrypted &amp; secured
+                <p className="text-center text-xs text-white/30 mt-6 sm:mt-8 tracking-tighter uppercase font-medium">
+                    System encrypted & secured
                 </p>
             </div>
         </div>
@@ -139,11 +139,11 @@ function LoginForm() {
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center relative bg-black overflow-hidden font-inter">
+        <div className="min-h-screen flex items-center justify-center relative bg-black overflow-hidden font-inter p-4 sm:p-0">
             {/* Background elements */}
-            <div className="absolute inset-x-0 top-0 h-96 bg-gradient-to-b from-orange/20 to-transparent pointer-events-none" />
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange/10 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange/5 blur-[100px] rounded-full pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-64 sm:h-96 bg-gradient-to-b from-orange/20 to-transparent pointer-events-none" />
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] sm:w-[40%] h-[50%] sm:h-[40%] bg-orange/10 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] sm:w-[40%] h-[50%] sm:h-[40%] bg-orange/5 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none" />
             <div className="absolute inset-0 bg-cyber-grid opacity-30 pointer-events-none" />
 
             <Suspense fallback={<div className="text-white">Loading security gateway...</div>}>

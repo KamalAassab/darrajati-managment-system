@@ -8,6 +8,8 @@ export interface Scooter {
     engine: string;
     speed: string;
     price: number;
+    quantity: number;
+    activeRentals?: number;
     status: 'available' | 'rented' | 'maintenance';
     createdAt: string;
     updatedAt: string;
@@ -74,10 +76,12 @@ export interface AnalyticsData {
         month: string;
         revenue: number;
         expenses: number;
+        profit: number;
     }[];
     topScooters: {
         id: string;
         name: string;
+        image: string;
         revenue: number;
         trips: number;
     }[];

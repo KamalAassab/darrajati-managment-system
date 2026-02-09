@@ -76,11 +76,10 @@ export default function ClientsPageClient({ initialClients }: ClientsPageClientP
     return (
         <div className="space-y-10 font-inter pb-20">
             {/* Header Area */}
-            <div className="flex flex-col md:flex-row justify-between items-end gap-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.3em] text-orange mb-2 text-glow-orange">Rolodex</p>
-                    <h1 className="text-3xl font-outfit font-black tracking-tighter text-white uppercase flex items-center gap-3">
-                        <Users className="w-8 h-8 text-orange" />
+                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3">
+                        <Users className="w-6 h-6 md:w-8 md:h-8 text-orange" />
                         Client Database
                     </h1>
                 </div>
@@ -101,10 +100,10 @@ export default function ClientsPageClient({ initialClients }: ClientsPageClientP
                     {/* Add Button */}
                     <button
                         onClick={handleCreate}
-                        className="bg-orange text-white px-6 py-3 rounded-2xl flex items-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 shadow-lg shadow-orange/20"
+                        className="bg-orange text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
                     >
-                        <Plus className="w-5 h-5" />
-                        <span className="hidden sm:inline">Add Client</span>
+                        <Plus className="w-6 h-6 md:w-5 md:h-5" />
+                        <span className="hidden md:inline">Add Client</span>
                     </button>
                 </div>
             </div>
@@ -116,8 +115,8 @@ export default function ClientsPageClient({ initialClients }: ClientsPageClientP
             {filteredClients.length === 0 ? (
                 <div className="glass-panel p-16 rounded-3xl text-center border-dashed border-white/10">
                     <Users className="w-16 h-16 text-white/10 mx-auto mb-6" />
-                    <h3 className="text-2xl font-outfit font-black text-white uppercase tracking-wide mb-2">No Clients Found</h3>
-                    <p className="text-white/40 text-sm font-mono uppercase tracking-widest">Try adjusting your search or add a new client.</p>
+                    <h3 className="text-2xl text-white uppercase mb-2">No Clients Found</h3>
+                    <p className="text-white/40 text-sm font-mono uppercase tracking-widest">Try adjusting your search</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-700 delay-100">

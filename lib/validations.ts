@@ -12,6 +12,7 @@ export const scooterSchema = z.object({
     engine: z.coerce.number().int().positive('Engine must be a positive integer (CC)'),
     speed: z.coerce.number().int().positive('Speed must be a positive integer (KM/H)'),
     price: z.coerce.number().int().positive('Price must be a positive integer'),
+    quantity: z.coerce.number().int().min(1, 'Quantity must be at least 1'),
     status: z.enum(['available', 'rented', 'maintenance']),
 });
 
@@ -42,7 +43,7 @@ export const rentalSchema = z.object({
 
 // Expense Schema
 export const expenseSchema = z.object({
-    category: z.enum(['maintenance', 'fuel', 'advertising', 'salary', 'rent', 'insurance', 'other']),
+    category: z.enum(['maintenance', 'fuel', 'advertising', 'salaries', 'rent', 'assurance', 'new_scooter', 'wifi', 'electricity_water', 'other']),
     amount: z.number().positive('Amount must be positive'),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Valid date required (YYYY-MM-DD)'),
     description: z.string().min(3, 'Description must be at least 3 characters'),

@@ -1,11 +1,11 @@
 'use client';
 
-import { completeRental } from '@/app/actions';
-import { CheckCircle } from 'lucide-react';
+import { revertRental } from '@/app/actions';
+import { RefreshCcw } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
 
-export default function CompleteRentalButton({ rentalId, compact = false, className = '' }: { rentalId: string, compact?: boolean, className?: string }) {
+export default function RevertRentalButton({ rentalId }: { rentalId: string }) {
     const [loading, setLoading] = useState(false);
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -22,25 +22,22 @@ export default function CompleteRentalButton({ rentalId, compact = false, classN
         onConfirm: () => { },
     });
 
-    const handleComplete = (e: React.MouseEvent) => {
-        e.preventDefault(); // Prevent navigation if inside a Link
-        e.stopPropagation();
-
+    const handleRevert = () => {
         setConfirmModal({
             isOpen: true,
-            title: 'Complete Rental',
-            message: 'Mark this rental as completed? This will free the scooter.',
+            title: 'Revert Rental Completion',
+            message: 'Are you sure you want to revert this rental to active status? This will mark the scooter as rented again.',
             type: 'warning',
-            confirmText: 'Complete',
+            confirmText: 'Revert',
             onConfirm: async () => {
                 setLoading(true);
-                const result = await completeRental(rentalId);
+                const result = await revertRental(rentalId);
 
                 if (!result.success) {
                     setConfirmModal({
                         isOpen: true,
                         title: 'Error',
-                        message: result.message || 'Failed to complete rental',
+                        message: result.message || 'Failed to revert rental',
                         type: 'danger',
                         onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
                         confirmText: 'OK',
@@ -55,21 +52,19 @@ export default function CompleteRentalButton({ rentalId, compact = false, classN
     return (
         <>
             <button
-                onClick={handleComplete}
+                onClick={handleRevert}
                 disabled={loading}
-                className={className || `w-full bg-orange hover:bg-orange/90 text-white ${compact ? 'p-1.5 text-[10px]' : 'p-3'} rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn shadow-[0_0_20px_-5px_#FF4500] flex-1 disabled:opacity-50 disabled:cursor-not-allowed`}
-                title="Complete Rental"
+                className="w-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white p-2.5 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 group/btn border border-white/5 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Revert Status"
             >
                 {loading ? (
-                    <div className={`${compact ? 'w-3 h-3' : 'w-5 h-5'} border-2 border-white/30 border-t-white rounded-full animate-spin`} />
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                    <CheckCircle className={compact ? 'w-3 h-3' : 'w-5 h-5'} />
+                    <RefreshCcw className="w-3.5 h-3.5" />
                 )}
-                {(!compact || !loading) && (
-                    <span className="font-bold uppercase tracking-widest">
-                        {compact ? 'Complete' : (loading ? 'Processing...' : 'Complete')}
-                    </span>
-                )}
+                <span className="font-bold text-[10px] uppercase tracking-wider">
+                    {loading ? 'Reverting...' : 'Revert'}
+                </span>
             </button>
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
