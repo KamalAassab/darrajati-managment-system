@@ -19,12 +19,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    metadataBase: new URL('https://darrajati-management.vercel.app'), // Replace with actual domain if different
+    metadataBase: new URL('https://darrajati-management.vercel.app'),
     title: {
         default: 'Darrajati Management System',
         template: '%s | Darrajati Management'
     },
     description: 'Management system for Darrajati scooter rental business.',
+    manifest: '/manifest.json',
     openGraph: {
         title: 'Darrajati Management System',
         description: 'Management system for Darrajati scooter rental business.',
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
     icons: {
         icon: '/favicon.svg',
         shortcut: '/favicon.svg',
-        apple: '/favicon.svg',
+        apple: '/logo.webp', // Use webp logo for Apple icon as well
     },
 };
 

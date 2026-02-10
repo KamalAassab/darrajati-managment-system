@@ -64,6 +64,7 @@ function LoginForm() {
                             className="object-contain drop-shadow-2xl relative z-10"
                             priority
                             sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
+                            quality={90}
                         />
                     </div>
                 </div>

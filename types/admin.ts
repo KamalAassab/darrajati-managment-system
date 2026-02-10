@@ -10,7 +10,9 @@ export interface Scooter {
     price: number;
     quantity: number;
     activeRentals?: number;
-    status: 'available' | 'rented' | 'maintenance';
+    maintenanceCount?: number;
+    availableCount?: number;
+    status: 'available' | 'rented' | 'maintenance'; // Computed for display compatibility
     createdAt: string;
     updatedAt: string;
 }
@@ -20,8 +22,6 @@ export interface Client {
     fullName: string;
     documentId: string; // CIN or Passport
     phone: string;
-    hasDeposit: boolean;
-    depositAmount: number;
     currentScooter?: string;
     createdAt: string;
     updatedAt: string;
@@ -47,6 +47,7 @@ export interface Rental {
     status: 'active' | 'completed' | 'cancelled';
     paymentStatus: 'paid' | 'pending' | 'partial';
     paymentMethod: 'cash' | 'transfer';
+    hasGuarantee?: boolean;
     notes?: string;
     createdAt: string;
     updatedAt: string;

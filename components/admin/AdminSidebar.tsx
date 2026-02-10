@@ -88,6 +88,7 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                                     fill
                                     className="object-contain"
                                     sizes="48px"
+                                    quality={90}
                                 />
                             </div>
                         ) : (
@@ -99,6 +100,7 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                                     className="object-contain object-left"
                                     sizes="(max-width: 768px) 100vw, 200px"
                                     priority
+                                    quality={90}
                                 />
                             </div>
                         )}

@@ -120,32 +120,10 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Deposit Amount</label>
-                            <input
-                                type="number"
-                                name="depositAmount"
-                                defaultValue={client?.depositAmount || 0}
-                                step="0.01"
-                                min="0"
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
-                            />
-                        </div>
+
                     </div>
 
-                    <div className="flex items-center gap-4 py-4 px-5 rounded-xl bg-white/5 border border-white/10 h-[60px] group hover:bg-white/10 transition-colors">
-                        <input
-                            type="checkbox"
-                            name="hasDeposit"
-                            id="hasDeposit"
-                            value="true"
-                            defaultChecked={client?.hasDeposit}
-                            className="cursor-pointer"
-                        />
-                        <label htmlFor="hasDeposit" className="font-bold text-xs uppercase tracking-widest text-white cursor-pointer select-none flex-1">
-                            Deposit Secured
-                        </label>
-                    </div>
+
 
                     <div className="pt-4 flex gap-4">
                         <button

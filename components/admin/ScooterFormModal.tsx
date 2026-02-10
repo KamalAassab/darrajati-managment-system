@@ -3,10 +3,9 @@
 import { useState, useEffect } from 'react';
 import { createScooter, updateScooter } from '@/app/actions';
 import { Scooter } from '@/types/admin';
-import { X, Upload, Loader2 } from 'lucide-react';
+import { X, Upload, Loader2, Wrench } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { CustomSelect } from './CustomSelect';
 
 interface ScooterFormModalProps {
     isOpen: boolean;
@@ -22,13 +21,13 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
     const [error, setError] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
     const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [status, setStatus] = useState<string>('available');
+    const [maintenanceCount, setMaintenanceCount] = useState<number>(0);
 
     // Reset form when modal opens/closes or scooter changes
     useEffect(() => {
         if (isOpen) {
             setImagePreview(scooter?.image || null);
-            setStatus(scooter?.status || 'available');
+            setMaintenanceCount(scooter?.maintenanceCount || 0);
             setError(null);
             setFieldErrors({});
         }
@@ -42,10 +41,6 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
 
         try {
             const formData = new FormData(e.currentTarget);
-            // Ensure status is in formData (CustomSelect includes hidden input, so it should be fine)
-            // But to be safe with CustomSelect's hidden input
-            // CustomSelect renders: <input type="hidden" name={name} value={value} />
-            // So formData.get('status') will work.
 
             let result;
             if (isEdit && scooter) {
@@ -220,17 +215,17 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-white uppercase tracking-wider">
-                                Status
+                            <label className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <Wrench className="w-4 h-4 text-red-500" /> Maintenance Count
                             </label>
-                            <CustomSelect
-                                name="status"
-                                value={status}
-                                onChange={setStatus}
-                                options={[
-                                    { value: 'available', label: 'Available', color: 'text-green-500' },
-                                    { value: 'maintenance', label: 'Maintenance', color: 'text-red-500' }
-                                ]}
+                            <input
+                                type="number"
+                                name="maintenanceCount"
+                                value={maintenanceCount}
+                                onChange={(e) => setMaintenanceCount(Number(e.target.value))}
+                                min="0"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                placeholder="0"
                             />
                         </div>
                     </div>

@@ -84,26 +84,26 @@ export default function ClientsPageClient({ initialClients }: ClientsPageClientP
                     </h1>
                 </div>
 
-                <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="flex flex-col-reverse md:flex-row items-center gap-4 w-full md:w-auto">
                     {/* Search */}
-                    <div className="relative flex-1 md:w-64">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                    <div className="relative w-full md:w-72 group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-orange transition-colors" />
                         <input
                             type="text"
                             placeholder="Search clients..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange/50 transition-all font-medium placeholder:text-white/20"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange/50 focus:ring-1 focus:ring-orange/20 transition-all font-medium placeholder:text-white/20 shadow-xl shadow-black/5"
                         />
                     </div>
 
                     {/* Add Button */}
                     <button
                         onClick={handleCreate}
-                        className="bg-orange text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
+                        className="bg-orange text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
                     >
-                        <Plus className="w-6 h-6 md:w-5 md:h-5" />
-                        <span className="hidden md:inline">Add Client</span>
+                        <Plus className="w-5 h-5" />
+                        <span>Add Client</span>
                     </button>
                 </div>
             </div>

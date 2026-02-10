@@ -2,10 +2,12 @@ import { getDashboardStats, getActiveRentals, getLatestRentals, getAnalyticsData
 import DashboardClient from './DashboardClient';
 
 export default async function Dashboard() {
-    const stats = await getDashboardStats();
-    const analyticsData = await getAnalyticsData();
-    const activeRentals = await getActiveRentals();
-    const latestRentals = await getLatestRentals(5);
+    const [stats, analyticsData, activeRentals, latestRentals] = await Promise.all([
+        getDashboardStats(),
+        getAnalyticsData(),
+        getActiveRentals(),
+        getLatestRentals(5)
+    ]);
 
     return (
         <DashboardClient

@@ -64,17 +64,7 @@ export function ClientCard({ client, onEdit, onDelete }: ClientCardProps) {
                     </div>
                 </div>
 
-                <div className="bg-white/[0.03] rounded-xl p-2.5 border border-white/[0.03] hover:border-white/10 transition-colors">
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Deposit</p>
-                    {client.hasDeposit ? (
-                        <div className="flex items-center gap-2 text-green-400">
-                            <ShieldCheck className="w-3.5 h-3.5" />
-                            <span className="font-price text-sm">{formatMAD(client.depositAmount)}</span>
-                        </div>
-                    ) : (
-                        <span className="text-xs font-bold text-white/20">None</span>
-                    )}
-                </div>
+
 
                 {client.currentScooter && (
                     <div className="col-span-2 bg-blue-500/[0.03] rounded-xl p-2.5 border border-blue-500/10 flex items-center justify-between group/scooter">

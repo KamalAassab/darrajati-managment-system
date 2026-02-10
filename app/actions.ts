@@ -21,8 +21,11 @@ export async function getScooters(): Promise<Scooter[]> {
 
     const rows = await sql`
         SELECT s.*, 
-            (SELECT COUNT(*) FROM rentals r WHERE r.scooter_id = s.id AND r.status = 'active') as active_rentals
-        FROM scooters s ORDER BY s.created_at ASC
+            COUNT(r.id) FILTER (WHERE r.status = 'active') as active_rentals
+        FROM scooters s 
+        LEFT JOIN rentals r ON s.id = r.scooter_id
+        GROUP BY s.id
+        ORDER BY s.created_at ASC
     `;
 
     return rows.map((row: any) => ({
@@ -35,7 +38,11 @@ export async function getScooters(): Promise<Scooter[]> {
         price: Number(row.price || 0),
         quantity: Number(row.quantity || 1),
         activeRentals: Number(row.active_rentals || 0),
-        status: row.status as any,
+        maintenanceCount: Number(row.maintenance_count || 0),
+        availableCount: Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)),
+        status: (Number(row.maintenance_count || 0) > 0 && Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0)
+            ? 'maintenance'
+            : (Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0 ? 'rented' : 'available'),
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at?.toString() || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at?.toString() || ''),
     })) as Scooter[];
@@ -47,9 +54,11 @@ export async function searchScooters(searchTerm: string): Promise<Scooter[]> {
     const ilikeTerm = `%${searchTerm}%`;
     const rows = await sql`
         SELECT s.*,
-            (SELECT COUNT(*) FROM rentals r WHERE r.scooter_id = s.id AND r.status = 'active') as active_rentals
+            COUNT(r.id) FILTER (WHERE r.status = 'active') as active_rentals
         FROM scooters s 
+        LEFT JOIN rentals r ON s.id = r.scooter_id
         WHERE s.name ILIKE ${ilikeTerm}
+        GROUP BY s.id
         ORDER BY s.name ASC
     `;
 
@@ -74,8 +83,11 @@ export async function getScooterById(id: string): Promise<Scooter | null> {
 
     const rows = await sql`
         SELECT s.*,
-             (SELECT COUNT(*) FROM rentals r WHERE r.scooter_id = s.id AND r.status = 'active') as active_rentals
-        FROM scooters s WHERE s.id = ${id}
+             COUNT(r.id) FILTER (WHERE r.status = 'active') as active_rentals
+        FROM scooters s 
+        LEFT JOIN rentals r ON s.id = r.scooter_id
+        WHERE s.id = ${id}
+        GROUP BY s.id
     `;
 
     if (rows.length === 0) return null;
@@ -146,14 +158,14 @@ export async function createScooter(prevState: any, formData: FormData): Promise
             speed: formData.get('speed'),
             price: formData.get('price'),
             quantity: formData.get('quantity') || 1,
-            status: formData.get('status') || 'available',
+            maintenanceCount: formData.get('maintenanceCount') || 0,
         };
 
         const validated = scooterSchema.parse(data);
 
         await sql`
             INSERT INTO scooters (
-                slug, name, image, engine, speed, price, quantity, status
+                slug, name, image, engine, speed, price, quantity, maintenance_count, status
             ) VALUES (
                 ${slug},
                 ${validated.name},
@@ -162,11 +174,13 @@ export async function createScooter(prevState: any, formData: FormData): Promise
                 ${String(validated.speed)},
                 ${validated.price},
                 ${validated.quantity},
-                ${validated.status}
+                ${validated.maintenanceCount},
+                'available'
             )
         `;
 
         revalidatePath('/dashboard/scooters');
+        revalidatePath('/dashboard/rentals/new');
         revalidatePath('/dashboard');
         return { success: true, message: 'Scooter created successfully' };
     } catch (error) {
@@ -175,17 +189,18 @@ export async function createScooter(prevState: any, formData: FormData): Promise
     }
 }
 
-export async function updateStatusAction(id: string, status: 'available' | 'rented' | 'maintenance'): Promise<ActionState> {
+export async function updateMaintenanceCountAction(id: string, count: number): Promise<ActionState> {
     await requireAuth();
 
     try {
         await sql`
-            UPDATE scooters SET status = ${status}, updated_at = CURRENT_TIMESTAMP WHERE id = ${id}
+            UPDATE scooters SET maintenance_count = ${count}, updated_at = CURRENT_TIMESTAMP WHERE id = ${id}
         `;
 
         revalidatePath('/dashboard/scooters');
+        revalidatePath('/dashboard/rentals/new');
         revalidatePath('/dashboard');
-        return { success: true, message: 'Status updated successfully' };
+        return { success: true, message: 'Maintenance status updated' };
     } catch (error) {
         return handleActionError(error);
     }
@@ -238,7 +253,7 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
             speed: formData.get('speed'),
             price: formData.get('price'),
             quantity: formData.get('quantity') || 1,
-            status: formData.get('status'),
+            maintenanceCount: formData.get('maintenanceCount') || 0,
         };
 
         const validated = scooterSchema.parse(data);
@@ -254,7 +269,7 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
                     speed = ${String(validated.speed)}, 
                     price = ${validated.price}, 
                     quantity = ${validated.quantity},
-                    status = ${validated.status}, 
+                    maintenance_count = ${validated.maintenanceCount}, 
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ${id}
             `;
@@ -267,13 +282,14 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
                     speed = ${String(validated.speed)}, 
                     price = ${validated.price}, 
                     quantity = ${validated.quantity},
-                    status = ${validated.status}, 
+                    maintenance_count = ${validated.maintenanceCount}, 
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ${id}
             `;
         }
 
         revalidatePath('/dashboard/scooters');
+        revalidatePath('/dashboard/rentals/new');
         revalidatePath('/dashboard');
         return { success: true, message: 'Scooter updated successfully' };
     } catch (error) {
@@ -327,6 +343,7 @@ export async function deleteScooter(id: string): Promise<ActionState> {
         }
 
         revalidatePath('/dashboard/scooters');
+        revalidatePath('/dashboard/rentals/new');
         revalidatePath('/dashboard');
         return { success: true, message: 'Scooter deleted successfully' };
     } catch (error) {
@@ -359,8 +376,6 @@ export async function getClients(): Promise<Client[]> {
         fullName: row.full_name,
         documentId: row.document_id,
         phone: row.phone,
-        hasDeposit: row.has_deposit,
-        depositAmount: Number(row.deposit_amount),
         currentScooter: row.current_scooter || undefined,
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at || ''),
@@ -375,8 +390,6 @@ export async function createClient(prevState: any, formData: FormData): Promise<
             fullName: formData.get('fullName'),
             documentId: formData.get('documentId'),
             phone: formData.get('phone'),
-            hasDeposit: formData.get('hasDeposit') === 'true',
-            depositAmount: parseFloat(formData.get('depositAmount') as string || '0'),
         };
 
         const validated = clientSchema.parse(data);
@@ -388,8 +401,8 @@ export async function createClient(prevState: any, formData: FormData): Promise<
         }
 
         await sql`
-            INSERT INTO clients (full_name, document_id, phone, has_deposit, deposit_amount)
-            VALUES (${validated.fullName}, ${validated.documentId}, ${validated.phone}, ${validated.hasDeposit}, ${validated.depositAmount})
+            INSERT INTO clients (full_name, document_id, phone)
+            VALUES (${validated.fullName}, ${validated.documentId}, ${validated.phone})
         `;
 
         revalidatePath('/dashboard/clients');
@@ -408,8 +421,6 @@ export async function updateClient(id: string, formData: FormData): Promise<Acti
             fullName: formData.get('fullName'),
             documentId: formData.get('documentId'),
             phone: formData.get('phone'),
-            hasDeposit: formData.get('hasDeposit') === 'true',
-            depositAmount: parseFloat(formData.get('depositAmount') as string || '0'),
         };
 
         const validated = clientSchema.parse(data);
@@ -428,8 +439,6 @@ export async function updateClient(id: string, formData: FormData): Promise<Acti
             SET full_name = ${validated.fullName}, 
                 document_id = ${validated.documentId}, 
                 phone = ${validated.phone}, 
-                has_deposit = ${validated.hasDeposit}, 
-                deposit_amount = ${validated.depositAmount},
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ${id}
         `;
@@ -561,6 +570,7 @@ function mapRowsToRentalWithDetails(rows: any[]): RentalWithDetails[] {
         status: row.status,
         paymentStatus: row.payment_status,
         paymentMethod: row.payment_method,
+        hasGuarantee: row.has_guarantee,
         notes: row.notes,
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at || ''),
@@ -586,8 +596,6 @@ export async function createRental(prevState: any, formData: FormData): Promise<
             fullName: formData.get('clientFullName'),
             documentId: formData.get('clientDocumentId'),
             phone: formData.get('clientPhone'),
-            hasDeposit: parseFloat(formData.get('depositAmount') as string || '0') > 0,
-            depositAmount: parseFloat(formData.get('depositAmount') as string || '0'),
         };
 
         const validatedClient = clientSchema.parse(clientData);
@@ -634,8 +642,8 @@ export async function createRental(prevState: any, formData: FormData): Promise<
         } else {
             // New Client - Insert safely
             const newClient = await sql`
-                INSERT INTO clients (full_name, document_id, phone, has_deposit, deposit_amount)
-                VALUES (${validatedClient.fullName}, ${validatedClient.documentId}, ${validatedClient.phone}, ${validatedClient.hasDeposit}, ${validatedClient.depositAmount})
+                INSERT INTO clients (full_name, document_id, phone)
+                VALUES (${validatedClient.fullName}, ${validatedClient.documentId}, ${validatedClient.phone})
                 RETURNING id
             `;
             clientId = newClient[0].id;
@@ -661,6 +669,7 @@ export async function createRental(prevState: any, formData: FormData): Promise<
             amountPaid: amountPaid,
             paymentStatus: paymentStatus,
             paymentMethod: formData.get('paymentMethod'),
+            hasGuarantee: formData.get('hasGuarantee') === 'on',
             notes: formData.get('notes') || undefined,
         };
 
@@ -668,7 +677,7 @@ export async function createRental(prevState: any, formData: FormData): Promise<
 
         // Security Check: Verify Scooter Availability
         const scooterCheck = await sql`
-            SELECT status, price, quantity FROM scooters WHERE id = ${validatedRental.scooterId}
+            SELECT status, price, quantity, maintenance_count FROM scooters WHERE id = ${validatedRental.scooterId}
         `;
 
         if (scooterCheck.length === 0) {
@@ -678,16 +687,16 @@ export async function createRental(prevState: any, formData: FormData): Promise<
         const scooter = scooterCheck[0];
         const quantity = Number(scooter.quantity || 1);
 
-        if (scooter.status === 'maintenance') {
-            return { success: false, message: 'This scooter is currently under maintenance.' };
-        }
-
         // Count active rentals for this scooter
         const activeRentals = await sql`
             SELECT COUNT(*) as count FROM rentals 
             WHERE scooter_id = ${validatedRental.scooterId} AND status = 'active'
         `;
         const activeCount = Number(activeRentals[0]?.count || 0);
+
+        if (quantity - activeCount - (scooter.maintenance_count || 0) <= 0) {
+            return { success: false, message: 'No scooters available (checked maintenance and active rentals).' };
+        }
 
         if (activeCount >= quantity) {
             return { success: false, message: `This scooter is out of stock (${activeCount}/${quantity} rented).` };
@@ -697,7 +706,7 @@ export async function createRental(prevState: any, formData: FormData): Promise<
         const rentalResult = await sql`
             INSERT INTO rentals 
             (scooter_id, client_id, start_date, end_date, total_price, amount_paid,
-             payment_status, payment_method, notes)
+             payment_status, payment_method, has_guarantee, notes)
             VALUES (
                 ${validatedRental.scooterId}, 
                 ${validatedRental.clientId}, 
@@ -707,6 +716,7 @@ export async function createRental(prevState: any, formData: FormData): Promise<
                 ${amountPaid},
                 ${validatedRental.paymentStatus}, 
                 ${validatedRental.paymentMethod}, 
+                ${validatedRental.hasGuarantee || false},
                 ${validatedRental.notes || null}
             )
             RETURNING id
@@ -722,19 +732,9 @@ export async function createRental(prevState: any, formData: FormData): Promise<
             `;
         }
 
-        // 5. Update Asset Status if full
-        if (activeCount + 1 >= quantity) {
-            await sql`
-                UPDATE scooters SET status = 'rented', updated_at = CURRENT_TIMESTAMP WHERE id = ${validatedRental.scooterId}
-            `;
-        } else {
-            // Ensure it's marked available if it wasn't
-            if (scooter.status === 'rented') {
-                await sql`
-                    UPDATE scooters SET status = 'available', updated_at = CURRENT_TIMESTAMP WHERE id = ${validatedRental.scooterId}
-                 `;
-            }
-        }
+        // 5. Update Asset Status if full - REMOVED legacy status update
+        // We no longer manage 'status' column directly for availability logic
+        // It is computed dynamically.
 
         // Synchronization
         revalidatePath('/dashboard/rentals');
@@ -1052,8 +1052,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         sql`SELECT COALESCE(SUM(amount), 0) as total FROM expenses`,
         sql`SELECT COUNT(*) as count FROM rentals WHERE status = 'active'`,
         sql`SELECT 
-            COUNT(*) as total,
-            COUNT(CASE WHEN status = 'available' THEN 1 END) as available
+            SUM(quantity) as total,
+            SUM(quantity - maintenance_count) as available_capacity
           FROM scooters`,
         sql`SELECT COUNT(*) as count FROM rentals WHERE status = 'active' AND end_date < CURRENT_DATE`,
     ]);

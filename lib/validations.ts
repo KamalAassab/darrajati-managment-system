@@ -13,7 +13,8 @@ export const scooterSchema = z.object({
     speed: z.coerce.number().int().positive('Speed must be a positive integer (KM/H)'),
     price: z.coerce.number().int().positive('Price must be a positive integer'),
     quantity: z.coerce.number().int().min(1, 'Quantity must be at least 1'),
-    status: z.enum(['available', 'rented', 'maintenance']),
+    maintenanceCount: z.coerce.number().int().min(0).default(0),
+    // status: z.enum(['available', 'rented', 'maintenance']), // Removed legacy status
 });
 
 // Client Schema
@@ -21,8 +22,6 @@ export const clientSchema = z.object({
     fullName: z.string().min(2, 'Full name must be at least 2 characters'),
     documentId: z.string().min(5, 'Valid CIN or Passport required'),
     phone: z.string().regex(/^(\+212|0)[56789]\d{8}$/, 'Valid Moroccan phone number required'),
-    hasDeposit: z.boolean(),
-    depositAmount: z.number().min(0, 'Deposit amount cannot be negative'),
 });
 
 // Rental Schema
@@ -35,6 +34,7 @@ export const rentalSchema = z.object({
     amountPaid: z.number().min(0, 'Amount paid cannot be negative'),
     paymentStatus: z.enum(['paid', 'pending', 'partial']),
     paymentMethod: z.enum(['cash', 'transfer']),
+    hasGuarantee: z.boolean().optional(),
     notes: z.string().optional(),
 }).refine((data) => new Date(data.endDate) >= new Date(data.startDate), {
     message: 'End date must be after start date',

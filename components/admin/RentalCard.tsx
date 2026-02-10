@@ -75,6 +75,15 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
                             </span>
                         </div>
                     </div>
+
+                    {rental.hasGuarantee && (
+                        <div className="sm:col-span-2 bg-green-500/10 rounded-xl p-3 border border-green-500/20 flex items-center gap-3">
+                            <CheckCircle className="w-5 h-5 text-green-500" />
+                            <p className="text-xs font-bold text-green-500 uppercase tracking-wider">
+                                Guarantee: 1000 MAD
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Actions */}

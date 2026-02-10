@@ -10,6 +10,7 @@ export interface SelectOption {
     bgColor?: string; // Background color class for badges
     borderColor?: string;
     icon?: React.ReactNode;
+    disabled?: boolean;
 }
 
 interface CustomSelectProps {
@@ -85,10 +86,13 @@ export function CustomSelect({
                         <button
                             type="button"
                             key={option.value}
-                            onClick={() => handleSelect(option.value)}
+                            onClick={() => !option.disabled && handleSelect(option.value)}
+                            disabled={option.disabled}
                             className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-sm font-bold uppercase tracking-wider transition-all text-left ${value === option.value
                                 ? `bg-white/10 text-white`
-                                : 'text-white/50 hover:text-white hover:bg-white/5'
+                                : option.disabled
+                                    ? 'text-white/20 cursor-not-allowed opacity-50'
+                                    : 'text-white/50 hover:text-white hover:bg-white/5'
                                 }`}
                         >
                             <span className={`flex items-center gap-2 ${option.color || ''}`}>

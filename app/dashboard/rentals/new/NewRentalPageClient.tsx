@@ -23,11 +23,13 @@ export default function NewRentalPageClient({
     const [isAmountManuallyChanged, setIsAmountManuallyChanged] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('cash');
 
-    const availableScooters = scooters.filter(s => s.status === 'available');
-
-    const scooterOptions = availableScooters.map(s => ({
+    const scooterOptions = scooters.map(s => ({
         value: s.id,
-        label: `${s.name} - ${formatMAD(s.price)}/day`
+        label: s.status === 'available'
+            ? `${s.name} - ${formatMAD(s.price)}/day`
+            : `${s.name} (${s.status === 'maintenance' ? 'MAINTENANCE' : 'RENTED'})`,
+        disabled: s.status !== 'available',
+        color: s.status !== 'available' ? 'text-red-500/50' : undefined
     }));
 
     const paymentOptions = [
@@ -209,20 +211,7 @@ export default function NewRentalPageClient({
                                 </div>
                             </div>
 
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Security Guarantee (Caution)</label>
-                                <div className="relative">
-                                    <input
-                                        type="number"
-                                        name="guaranteeAmount"
-                                        min="0"
-                                        step="1"
-                                        placeholder="0.00"
-                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all"
-                                    />
-                                    <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white/20 uppercase tracking-widest">MAD</span>
-                                </div>
-                            </div>
+
 
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Payment Method *</label>
@@ -233,6 +222,34 @@ export default function NewRentalPageClient({
                                     options={paymentOptions}
                                     required
                                 />
+                            </div>
+
+                            <div className="space-y-2 pt-1 sm:col-span-2 md:col-span-1">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1 block mb-2">Security Deposit</label>
+                                <label className="relative flex items-center gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-orange/30 transition-all cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        name="hasGuarantee"
+                                        className="peer sr-only"
+                                    />
+                                    <div className="h-5 w-5 rounded border-2 border-white/20 bg-transparent transition-all peer-checked:border-orange peer-checked:bg-orange flex items-center justify-center">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            className="h-3.5 w-3.5 text-black opacity-0 transition-opacity peer-checked:opacity-100 font-bold"
+                                            viewBox="0 0 20 20"
+                                            fill="currentColor"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <span className="text-sm font-bold text-white group-hover:text-white/90">
+                                        Guarantee Check (1000 MAD)
+                                    </span>
+                                </label>
                             </div>
                         </div>
 

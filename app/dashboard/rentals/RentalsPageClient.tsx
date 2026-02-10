@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Plus, Search, Activity, Users } from 'lucide-react';
+import { Plus, Search, Activity, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { RentalPaymentsModal } from '@/components/admin/RentalPaymentsModal';
 import { useState } from 'react';
 import { RentalWithDetails } from '@/types/admin';
 import { RentalStats } from '@/components/admin/RentalStats';
 import { RentalCard } from '@/components/admin/RentalCard';
+import { cn } from '@/lib/utils';
 
 interface RentalsPageClientProps {
     activeRentals: RentalWithDetails[];
@@ -15,7 +16,7 @@ interface RentalsPageClientProps {
 
 export default function RentalsPageClient({ activeRentals, completedRentals }: RentalsPageClientProps) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'completed'>('all');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'overdue' | 'completed'>('all');
     const [paymentModalRental, setPaymentModalRental] = useState<RentalWithDetails | null>(null);
 
     // Combine all rentals for filtering
@@ -27,16 +28,32 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
             rental.client.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
             rental.scooter.name.toLowerCase().includes(searchTerm.toLowerCase());
 
-        const matchesStatus =
-            statusFilter === 'all' ? true :
-                statusFilter === 'active' ? rental.status === 'active' :
-                    rental.status === 'completed';
+        let matchesStatus = true;
+        const isOverdue = rental.status === 'active' && new Date(rental.endDate) < new Date(new Date().setHours(0, 0, 0, 0));
+
+        switch (statusFilter) {
+            case 'active':
+                matchesStatus = rental.status === 'active' && !isOverdue;
+                break;
+            case 'overdue':
+                matchesStatus = isOverdue;
+                break;
+            case 'completed':
+                matchesStatus = rental.status === 'completed';
+                break;
+            default:
+                matchesStatus = true;
+        }
 
         return matchesSearch && matchesStatus;
     });
 
+    const overdueCount = activeRentals.filter(r => new Date(r.endDate) < new Date(new Date().setHours(0, 0, 0, 0))).length;
+    const activeCount = activeRentals.length - overdueCount;
+    const completedCount = completedRentals.length;
+
     return (
-        <div className="space-y-10 pb-20 font-alexandria">
+        <div className="space-y-8 pb-20 font-alexandria">
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
@@ -47,25 +64,13 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                 </div>
 
                 <div className="flex items-center gap-4 w-full md:w-auto">
-                    {/* Search */}
-                    <div className="relative flex-1 md:w-64">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-                        <input
-                            type="text"
-                            placeholder="Search rentals..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange/50 transition-all font-medium placeholder:text-white/20"
-                        />
-                    </div>
-
                     {/* Create Button */}
                     <Link
                         href="/dashboard/rentals/new"
-                        className="bg-orange text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
+                        className="bg-orange text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
                     >
-                        <Plus className="w-6 h-6 md:w-5 md:h-5" />
-                        <span className="hidden md:inline">Create Rental</span>
+                        <Plus className="w-5 h-5" />
+                        <span>Create Rental</span>
                     </Link>
                 </div>
             </div>
@@ -73,15 +78,107 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
             {/* Stats Overview */}
             <RentalStats activeRentals={activeRentals} completedRentals={completedRentals} />
 
+            {/* Filters & Search Bar */}
+            <div className="flex flex-col-reverse md:flex-row gap-4 items-center justify-between">
+                {/* Filter Tabs */}
+                <div className="flex p-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl w-full md:w-auto overflow-x-auto no-scrollbar shadow-xl shadow-black/5">
+                    <button
+                        onClick={() => setStatusFilter('all')}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                            statusFilter === 'all'
+                                ? "bg-white text-black shadow-lg scale-[1.02]"
+                                : "text-white/50 hover:text-white hover:bg-white/5"
+                        )}
+                    >
+                        All
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('active')}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                            statusFilter === 'active'
+                                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20 scale-[1.02]"
+                                : "text-white/50 hover:text-blue-400 hover:bg-blue-500/10"
+                        )}
+                    >
+                        <Activity className="w-4 h-4" />
+                        Active
+                        <span className={cn(
+                            "text-[10px] px-1.5 py-0.5 rounded-full ml-1",
+                            statusFilter === 'active' ? "bg-white/20 text-white" : "bg-white/10 text-white/60"
+                        )}>{activeCount}</span>
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('overdue')}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                            statusFilter === 'overdue'
+                                ? "bg-red-500 text-white shadow-lg shadow-red-500/20 scale-[1.02]"
+                                : "text-white/50 hover:text-red-400 hover:bg-red-500/10"
+                        )}
+                    >
+                        <AlertCircle className="w-4 h-4" />
+                        Overdue
+                        {overdueCount > 0 && (
+                            <span className={cn(
+                                "text-[10px] px-1.5 py-0.5 rounded-full ml-1",
+                                statusFilter === 'overdue' ? "bg-white/20 text-white" : "bg-red-500/20 text-red-200"
+                            )}>{overdueCount}</span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('completed')}
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap",
+                            statusFilter === 'completed'
+                                ? "bg-green-500 text-white shadow-lg shadow-green-500/20 scale-[1.02]"
+                                : "text-white/50 hover:text-green-400 hover:bg-green-500/10"
+                        )}
+                    >
+                        <CheckCircle2 className="w-4 h-4" />
+                        Completed
+                        <span className={cn(
+                            "text-[10px] px-1.5 py-0.5 rounded-full ml-1",
+                            statusFilter === 'completed' ? "bg-white/20 text-white" : "bg-white/10 text-white/60"
+                        )}>{completedCount}</span>
+                    </button>
+                </div>
+
+                {/* Search */}
+                <div className="relative w-full md:w-72 group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-orange transition-colors" />
+                    <input
+                        type="text"
+                        placeholder="Search client, scooter..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange/50 focus:ring-1 focus:ring-orange/20 transition-all font-medium placeholder:text-white/20 shadow-xl shadow-black/5"
+                    />
+                </div>
+            </div>
+
             {/* Content Area */}
             {filteredRentals.length === 0 ? (
-                <div className="glass-panel p-16 rounded-3xl text-center border-dashed border-white/10">
-                    <Activity className="w-16 h-16 text-white/10 mx-auto mb-6" />
-                    <h3 className="text-2xl text-white uppercase mb-2">No Rentals Found</h3>
-                    <p className="text-white/40 text-sm font-mono uppercase tracking-widest">Try adjusting your search</p>
+                <div className="glass-panel p-16 rounded-3xl text-center border-dashed border-white/10 flex flex-col items-center justify-center min-h-[400px]">
+                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                        {statusFilter === 'overdue' ? (
+                            <Clock className="w-8 h-8 text-white/20" />
+                        ) : statusFilter === 'completed' ? (
+                            <CheckCircle2 className="w-8 h-8 text-white/20" />
+                        ) : (
+                            <Activity className="w-8 h-8 text-white/20" />
+                        )}
+                    </div>
+                    <h3 className="text-xl text-white font-medium mb-2">No Rentals Found</h3>
+                    <p className="text-white/40 text-sm max-w-xs mx-auto">
+                        {statusFilter === 'all'
+                            ? "Try adjusting your search terms or create a new rental."
+                            : `There are no ${statusFilter} rentals matching your criteria.`}
+                    </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-700 delay-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
                     {filteredRentals.map((rental) => (
                         <RentalCard
                             key={rental.id}
