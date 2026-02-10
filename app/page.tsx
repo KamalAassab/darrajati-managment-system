@@ -4,6 +4,7 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, User, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import Image from 'next/image';
 import { authenticate } from '@/app/actions';
 
 function LoginButton() {
@@ -53,20 +54,21 @@ function LoginForm() {
     return (
         <div className="w-full max-w-md relative z-10 px-4 sm:px-6 md:px-0">
             <div className="glass-panel-dark rounded-3xl p-6 sm:p-8 md:p-10 orange-glow-border">
-                <div className="flex justify-center mb-6 sm:mb-8">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-orange rounded-2xl flex items-center justify-center orange-glow transition-all duration-300">
-                        <ShieldCheck className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-white" />
+                <div className="flex justify-center mb-8 sm:mb-10">
+                    <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 transition-all duration-300 hover:scale-105">
+                        <div className="absolute inset-0 bg-orange/20 blur-3xl rounded-full" />
+                        <Image
+                            src="/logo.webp"
+                            alt="Darrajati Logo"
+                            fill
+                            className="object-contain drop-shadow-2xl relative z-10"
+                            priority
+                            sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
+                        />
                     </div>
                 </div>
 
-                <div className="text-center mb-6 sm:mb-8 md:mb-10">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-outfit tracking-tighter text-white mb-2 uppercase italic text-glow-orange font-bold transition-all duration-300">
-                        Darrajati <span className="text-orange">Admin</span>
-                    </h1>
-                    <p className="text-muted-foreground text-xs md:text-sm tracking-widest uppercase font-inter font-medium opacity-60">
-                        Security Gateway
-                    </p>
-                </div>
+
 
                 <form action={dispatch} className="space-y-5 sm:space-y-6">
                     {uiError && (

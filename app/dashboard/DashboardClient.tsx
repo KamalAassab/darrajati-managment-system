@@ -1,3 +1,5 @@
+'use client';
+
 import dynamic from 'next/dynamic';
 import { KPICard } from '@/components/admin/KPICard';
 import { formatMAD, isOverdue, formatDate } from '@/lib/utils/currency';

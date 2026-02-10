@@ -81,24 +81,26 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                 <div className={`p-8 pb-4 ${isCollapsed ? 'md:px-4 md:flex md:flex-col md:items-center' : ''}`}>
                     <Link href="/dashboard" prefetch={true} className="block" onClick={onMobileClose}>
                         {isCollapsed ? (
-                            <>
-                                <div className="relative w-10 h-10 rounded-full overflow-hidden border border-white/10">
-                                    <Image
-                                        src="/avatar-placeholder.png"
-                                        alt="User"
-                                        fill
-                                        className="object-cover"
-                                        sizes="40px"
-                                    />
-                                </div>
-                                <h1 className="text-3xl text-white uppercase leading-none md:hidden">
-                                    Darrajati <span className="text-orange text-glow-orange block text-xl">Admin Panel</span>
-                                </h1>
-                            </>
+                            <div className="relative w-10 h-10 md:w-12 md:h-12 transition-all duration-300">
+                                <Image
+                                    src="/logo.webp"
+                                    alt="Darrajati Admin"
+                                    fill
+                                    className="object-contain"
+                                    sizes="48px"
+                                />
+                            </div>
                         ) : (
-                            <h1 className="text-3xl text-white uppercase leading-none">
-                                Darrajati <span className="text-orange text-glow-orange block text-xl">Admin Panel</span>
-                            </h1>
+                            <div className="relative w-full h-16 transition-all duration-300">
+                                <Image
+                                    src="/logo.webp"
+                                    alt="Darrajati Admin"
+                                    fill
+                                    className="object-contain object-left"
+                                    sizes="(max-width: 768px) 100vw, 200px"
+                                    priority
+                                />
+                            </div>
                         )}
                     </Link>
                     <div className={`h-[1px] bg-orange mt-4 opacity-50 ${isCollapsed ? 'md:w-8' : 'w-12'}`}></div>
