@@ -1,0 +1,48 @@
+
+> darrajati-management@1.0.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  ┬À serverActions
+
+ÔÜá The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 50s
+  Running TypeScript ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/10) ...
+  Generating static pages using 7 workers (2/10) 
+  Generating static pages using 7 workers (4/10) 
+  Generating static pages using 7 workers (7/10) 
+Get current user error: Error: NEXT_REDIRECT
+    at i (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\[root-of-the-server]__f2d23ceb._.js:425:61821)
+    at j (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\[root-of-the-server]__f2d23ceb._.js:425:61999)
+    at ce (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\[root-of-the-server]__f2d23ceb._.js:447:506)
+    at async nc (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\[root-of-the-server]__f2d23ceb._.js:751:1219)
+    at async e (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\_fe3aac6f._.js:1:1332) {
+  digest: 'NEXT_REDIRECT;replace;/login;307;'
+}
+Ô£ô Generating static pages using 7 workers (10/10) in 1213.6ms
+  Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ ãÆ /dashboard
+Ôö£ ãÆ /dashboard/clients
+Ôö£ ãÆ /dashboard/finances
+Ôö£ ãÆ /dashboard/overdues
+Ôö£ ãÆ /dashboard/rentals
+Ôö£ ãÆ /dashboard/rentals/[id]/edit
+Ôö£ ãÆ /dashboard/rentals/new
+Ôö£ ãÆ /dashboard/scooters
+Ôöö ãÆ /dashboard/settings
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+
