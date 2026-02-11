@@ -5,6 +5,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     images: {
+        formats: ['image/webp'],
+        qualities: [75, 90],
         remotePatterns: [
             {
                 protocol: 'https',

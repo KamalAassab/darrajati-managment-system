@@ -22,7 +22,7 @@ export default auth((req) => {
     // without strict nonce configuration, but this locks down external sources.
     response.headers.set(
         'Content-Security-Policy',
-        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' https://neondb.net wss://neondb.net;"
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://res.cloudinary.com; font-src 'self' data:; connect-src 'self' https://neondb.net wss://neondb.net https://va.vercel-scripts.com;"
     );
 
     return response;
