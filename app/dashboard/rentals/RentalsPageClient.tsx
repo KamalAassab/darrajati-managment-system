@@ -179,22 +179,26 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                     </p>
                 </div>
             ) : (
+<<<<<<< HEAD
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 animate-in slide-in-from-bottom-4 duration-500">
+=======
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                    {filteredRentals.map((rental) => (
-                        <RentalCard
-                            key={rental.id}
-                            rental={rental}
-                            onPayment={setPaymentModalRental}
-                        />
-                    ))}
-                </div>
+>>>>>>> 30cf315 (feat: website color overhaul (Burnished Amber), font restoration (Outfit 900), and UI density optimizations across dashboard sections)
+                        {filteredRentals.map((rental) => (
+                            <RentalCard
+                                key={rental.id}
+                                rental={rental}
+                                onPayment={setPaymentModalRental}
+                            />
+                        ))}
+                    </div>
             )}
 
-            <RentalPaymentsModal
-                isOpen={!!paymentModalRental}
-                onClose={() => setPaymentModalRental(null)}
-                rental={paymentModalRental}
-            />
-        </div>
-    );
+                    <RentalPaymentsModal
+                        isOpen={!!paymentModalRental}
+                        onClose={() => setPaymentModalRental(null)}
+                        rental={paymentModalRental}
+                    />
+                </div>
+            );
 }
