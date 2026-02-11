@@ -34,5 +34,8 @@ export function calculateRentalPrice(dailyPrice: number, startDate: string, endD
 }
 
 export function isOverdue(endDate: string): boolean {
-    return new Date(endDate) < new Date() && new Date().toDateString() !== new Date(endDate).toDateString();
+    // Use date strings for comparison to avoid timezone issues during hydration
+    const today = new Date().toISOString().split('T')[0];
+    const end = new Date(endDate).toISOString().split('T')[0];
+    return end < today;
 }

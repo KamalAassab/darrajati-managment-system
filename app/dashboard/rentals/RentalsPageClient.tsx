@@ -8,6 +8,7 @@ import { RentalWithDetails } from '@/types/admin';
 import { RentalStats } from '@/components/admin/RentalStats';
 import { RentalCard } from '@/components/admin/RentalCard';
 import { cn } from '@/lib/utils';
+import { isOverdue } from '@/lib/utils/currency';
 
 interface RentalsPageClientProps {
     activeRentals: RentalWithDetails[];
@@ -29,14 +30,14 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
             rental.scooter.name.toLowerCase().includes(searchTerm.toLowerCase());
 
         let matchesStatus = true;
-        const isOverdue = rental.status === 'active' && new Date(rental.endDate) < new Date(new Date().setHours(0, 0, 0, 0));
+        const rentalIsOverdue = rental.status === 'active' && isOverdue(rental.endDate);
 
         switch (statusFilter) {
             case 'active':
-                matchesStatus = rental.status === 'active' && !isOverdue;
+                matchesStatus = rental.status === 'active' && !rentalIsOverdue;
                 break;
             case 'overdue':
-                matchesStatus = isOverdue;
+                matchesStatus = rentalIsOverdue;
                 break;
             case 'completed':
                 matchesStatus = rental.status === 'completed';
@@ -48,7 +49,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
         return matchesSearch && matchesStatus;
     });
 
-    const overdueCount = activeRentals.filter(r => new Date(r.endDate) < new Date(new Date().setHours(0, 0, 0, 0))).length;
+    const overdueCount = activeRentals.filter(r => isOverdue(r.endDate)).length;
     const activeCount = activeRentals.length - overdueCount;
     const completedCount = completedRentals.length;
 
@@ -178,7 +179,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 animate-in slide-in-from-bottom-4 duration-500">
                     {filteredRentals.map((rental) => (
                         <RentalCard
                             key={rental.id}
