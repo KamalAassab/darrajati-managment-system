@@ -160,14 +160,14 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
 
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3">
-                        <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-orange" />
+                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton">
+                        <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                         Finances
                     </h1>
                 </div>
                 <button
                     onClick={() => showForm ? setShowForm(false) : handleOpenCreate()}
-                    className="bg-orange text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
+                    className="bg-primary text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-primary/20"
                 >
                     <Plus className={`w-6 h-6 md:w-5 md:h-5 transition-transform duration-300 ${showForm ? 'rotate-45' : ''}`} />
                     <span className="hidden md:inline">{showForm ? 'Cancel' : 'Add Expense'}</span>
@@ -175,27 +175,27 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
             </div>
 
             {/* Financial Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
-                <div className="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-8 relative overflow-hidden group col-span-2 md:col-span-1">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4">
+                <div className="glass-panel rounded-2xl p-3 md:p-5 relative overflow-hidden group col-span-2 md:col-span-1">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 blur-3xl rounded-full" />
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1 md:mb-2">Total Revenue</p>
-                    <p className="text-2xl md:text-4xl font-outfit font-black text-green-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
+                    <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">Total Revenue</p>
+                    <p className="text-lg md:text-2xl font-outfit font-black text-green-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
                         {formatMAD(dashboardStats.totalRevenue)}
                     </p>
                 </div>
 
-                <div className="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-8 relative overflow-hidden group">
+                <div className="glass-panel rounded-2xl p-3 md:p-5 relative overflow-hidden group">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 blur-3xl rounded-full" />
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1 md:mb-2">Total Expenses</p>
-                    <p className="text-xl md:text-4xl font-outfit font-black text-red-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
+                    <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">Total Expenses</p>
+                    <p className="text-lg md:text-2xl font-outfit font-black text-red-500 tracking-tight group-hover:scale-110 origin-left transition-transform duration-500">
                         {formatMAD(dashboardStats.totalExpenses)}
                     </p>
                 </div>
 
-                <div className="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-8 relative overflow-hidden group orange-glow-border">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-orange/5 blur-3xl rounded-full" />
-                    <p className="text-[10px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1 md:mb-2">Net Profit</p>
-                    <p className={`text-xl md:text-4xl font-outfit font-black tracking-tight group-hover:scale-110 origin-left transition-transform duration-500 ${dashboardStats.netProfit >= 0 ? 'text-orange text-glow-orange' : 'text-red-500'
+                <div className="glass-panel rounded-2xl p-3 md:p-5 relative overflow-hidden group primary-glow-border">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-3xl rounded-full" />
+                    <p className="text-[9px] font-bold text-white/30 uppercase tracking-[0.2em] mb-1">Net Profit</p>
+                    <p className={`text-lg md:text-2xl font-outfit font-black tracking-tight group-hover:scale-110 origin-left transition-transform duration-500 ${dashboardStats.netProfit >= 0 ? 'text-primary text-glow-primary' : 'text-red-500'
                         }`}>
                         {formatMAD(dashboardStats.netProfit)}
                     </p>
@@ -204,7 +204,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
 
             {/* Add/Edit Expense Form */}
             {showForm && (
-                <div className="glass-panel rounded-3xl p-8 orange-glow-border animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="glass-panel rounded-3xl p-8 primary-glow-border animate-in fade-in slide-in-from-top-4 duration-500">
                     <div className="flex justify-between items-center mb-8">
                         <h2 className="text-2xl text-white uppercase">
                             {editingId ? 'Edit Expense' : 'Add Expense'}
@@ -238,7 +238,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                         step="0.01"
                                         min="0"
                                         defaultValue={editFormData?.amount}
-                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all font-mono"
+                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-primary/50 outline-none transition-all font-mono"
                                         placeholder="0.00"
                                     />
                                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white/20 uppercase tracking-widest">MAD</span>
@@ -252,7 +252,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                     name="date"
                                     required
                                     defaultValue={editFormData?.date}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all cursor-pointer"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-primary/50 outline-none transition-all cursor-pointer"
                                 />
                             </div>
 
@@ -263,7 +263,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                                     required
                                     rows={2}
                                     defaultValue={editFormData?.description}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-orange/50 outline-none transition-all resize-none placeholder:text-white/20"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-primary/50 outline-none transition-all resize-none placeholder:text-white/20"
                                     placeholder="Enter details about this expense..."
                                 />
                             </div>
@@ -273,7 +273,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex-1 bg-orange text-white font-bold py-4 rounded-xl hover:bg-orange/90 transition-all duration-300 orange-glow uppercase tracking-wide disabled:opacity-50 disabled:cursor-wait"
+                                className="flex-1 bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-all duration-300 primary-glow uppercase tracking-wide disabled:opacity-50 disabled:cursor-wait"
                             >
                                 {isSubmitting ? 'Saving...' : (editingId ? 'Update Expense' : 'Save Expense')}
                             </button>

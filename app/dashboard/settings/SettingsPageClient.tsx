@@ -90,11 +90,11 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
     }
 
     return (
-        <div className="space-y-8 pb-20 font-alexandria">
+        <div className="space-y-8 pb-20 font-outfit">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-orange/10 border border-orange/20 flex items-center justify-center">
-                    <Settings className="w-6 h-6 text-orange" />
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                    <Settings className="w-6 h-6 text-primary" />
                 </div>
                 <div>
                     <h1 className="text-2xl md:text-3xl text-white uppercase font-bold">Settings</h1>
@@ -106,7 +106,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                 {/* Change Username */}
                 <div className="glass-panel rounded-3xl p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <User className="w-5 h-5 text-orange" />
+                        <User className="w-5 h-5 text-primary" />
                         <h2 className="text-lg text-white uppercase font-bold">Change Username</h2>
                     </div>
 
@@ -119,7 +119,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                                 type="text"
                                 value={newUsername}
                                 onChange={(e) => setNewUsername(e.target.value)}
-                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-orange/50 focus:outline-none transition-colors"
+                                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors"
                                 placeholder="Enter new username"
                                 minLength={3}
                                 maxLength={50}
@@ -144,7 +144,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                         <button
                             type="submit"
                             disabled={usernameLoading || newUsername === currentUser.username}
-                            className="w-full bg-orange text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-orange/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-primary text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {usernameLoading ? 'Updating...' : 'Update Username'}
                         </button>
@@ -154,7 +154,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                 {/* Change Password */}
                 <div className="glass-panel rounded-3xl p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <Lock className="w-5 h-5 text-orange" />
+                        <Lock className="w-5 h-5 text-primary" />
                         <h2 className="text-lg text-white uppercase font-bold">Change Password</h2>
                     </div>
 
@@ -168,7 +168,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                                     type={showCurrentPassword ? "text" : "password"}
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-orange/50 focus:outline-none transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors"
                                     placeholder="Enter current password"
                                     required
                                 />
@@ -191,7 +191,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                                     type={showNewPassword ? "text" : "password"}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-orange/50 focus:outline-none transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors"
                                     placeholder="Enter new password"
                                     minLength={4}
                                     required
@@ -215,7 +215,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                                     type={showConfirmPassword ? "text" : "password"}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-orange/50 focus:outline-none transition-colors"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:border-primary/50 focus:outline-none transition-colors"
                                     placeholder="Confirm new password"
                                     minLength={4}
                                     required
@@ -246,7 +246,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                         <button
                             type="submit"
                             disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
-                            className="w-full bg-orange text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-orange/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-primary text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {passwordLoading ? 'Updating...' : 'Update Password'}
                         </button>

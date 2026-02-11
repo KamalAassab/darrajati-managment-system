@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
     LayoutDashboard,
@@ -44,8 +43,8 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
         glass-panel-dark border-r border-white/5 h-screen flex flex-col transition-all duration-300 ease-in-out
         fixed md:sticky top-0 z-50
         ${isMobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-        ${isCollapsed ? 'md:w-24' : 'md:w-72'}
-        w-72
+        ${isCollapsed ? 'md:w-20' : 'md:w-64'}
+        w-64
     `;
 
     return (
@@ -82,30 +81,23 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                     <Link href="/dashboard" prefetch={true} className="block" onClick={onMobileClose}>
                         {isCollapsed ? (
                             <div className="relative w-10 h-10 md:w-12 md:h-12 transition-all duration-300">
-                                <Image
+                                <img
                                     src="/logo.webp"
                                     alt="Darrajati Admin"
-                                    fill
-                                    className="object-contain"
-                                    sizes="48px"
-                                    quality={90}
+                                    className="absolute inset-0 w-full h-full object-contain"
                                 />
                             </div>
                         ) : (
                             <div className="relative w-full h-16 transition-all duration-300">
-                                <Image
+                                <img
                                     src="/logo.webp"
                                     alt="Darrajati Admin"
-                                    fill
-                                    className="object-contain object-left"
-                                    sizes="(max-width: 768px) 100vw, 200px"
-                                    priority
-                                    quality={90}
+                                    className="absolute inset-0 w-full h-full object-contain object-left"
                                 />
                             </div>
                         )}
                     </Link>
-                    <div className={`h-[1px] bg-orange mt-4 opacity-50 ${isCollapsed ? 'md:w-8' : 'w-12'}`}></div>
+                    <div className={`h-[1px] bg-primary mt-4 opacity-50 ${isCollapsed ? 'md:w-8' : 'w-12'}`}></div>
                 </div>
 
                 <nav className={`flex-1 overflow-y-auto py-4 space-y-6 admin-scrollbar ${isCollapsed ? 'md:px-3' : 'px-8'}`}>
@@ -120,12 +112,12 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                                     prefetch={true}
                                     onClick={onMobileClose}
                                     className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group relative ${isActive
-                                        ? 'bg-orange/10 text-orange border border-orange/20'
+                                        ? 'bg-primary/10 text-primary border border-primary/20'
                                         : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
                                         } ${isCollapsed ? 'md:justify-center' : ''}`}
                                     title={isCollapsed ? item.label : ''}
                                 >
-                                    <ItemIcon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-orange' : 'text-white/30'}`} />
+                                    <ItemIcon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-primary' : 'text-white/30'}`} />
                                     <span className={`text-sm tracking-tight ${isCollapsed ? 'md:hidden' : ''} ${isActive ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
                                     {item.badge && (
                                         <span className={`absolute ${isCollapsed ? 'md:-top-1 md:-right-1 top-1/2 -translate-y-1/2 right-3' : 'right-3'} min-w-[20px] h-[20px] bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-lg`}>

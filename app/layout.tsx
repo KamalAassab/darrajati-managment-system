@@ -1,21 +1,19 @@
 import type { Metadata } from 'next';
-import { Outfit, Inter } from 'next/font/google';
+import { Inter, Outfit } from 'next/font/google';
 import 'flag-icons/css/flag-icons.min.css';
 import './globals.css';
-import { Analytics } from '@vercel/analytics/react';
-
-const outfit = Outfit({
-    subsets: ['latin'],
-    variable: '--font-outfit',
-    weight: ['300', '400', '500', '600', '700', '800', '900'],
-    display: 'swap',
-});
 
 const inter = Inter({
     subsets: ['latin'],
     variable: '--font-inter',
-    weight: ['300', '400', '500', '600', '700', '800', '900'],
     display: 'swap',
+});
+
+const outfit = Outfit({
+    subsets: ['latin'],
+    variable: '--font-outfit',
+    display: 'swap',
+    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
 });
 
 export const metadata: Metadata = {
@@ -51,10 +49,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" dir="ltr" className="scroll-smooth">
-            <body suppressHydrationWarning className={`${inter.variable} ${outfit.variable} font-inter bg-black text-white min-h-screen overflow-x-hidden antialiased`}>
+        <html lang="en" dir="ltr" className={`scroll-smooth ${inter.variable} ${outfit.variable}`}>
+            <head>
+                {/* Fonts are now loaded via next/font/google */}
+            </head>
+            <body suppressHydrationWarning className="font-inter bg-black text-white min-h-screen overflow-x-hidden antialiased">
                 {children}
-                <Analytics />
             </body>
         </html>
     );

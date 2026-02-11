@@ -111,7 +111,7 @@ export default function EditRentalPageClient({
                                 required
                                 value={selectedScooter}
                                 onChange={(e) => setSelectedScooter(e.target.value)}
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all appearance-none"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all appearance-none"
                             >
                                 {scooters.map((scooter) => (
                                     <option key={scooter.id} value={scooter.id} className="bg-[#111]">
@@ -129,7 +129,7 @@ export default function EditRentalPageClient({
                                 required
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all custom-calendar-picker"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all custom-calendar-picker"
                             />
                         </div>
 
@@ -142,7 +142,7 @@ export default function EditRentalPageClient({
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 min={startDate}
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all custom-calendar-picker"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all custom-calendar-picker"
                             />
                         </div>
 
@@ -157,7 +157,7 @@ export default function EditRentalPageClient({
                                     required
                                     value={amountPaid}
                                     onChange={(e) => setAmountPaid(Math.max(0, parseInt(e.target.value) || 0))}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all"
                                 />
                                 <span className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-white/20 uppercase tracking-widest">MAD</span>
                             </div>
@@ -170,7 +170,7 @@ export default function EditRentalPageClient({
                                 required
                                 value={paymentMethod}
                                 onChange={(e) => setPaymentMethod(e.target.value)}
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all appearance-none"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all appearance-none"
                             >
                                 <option value="cash" className="bg-[#111]">Cash</option>
                                 <option value="transfer" className="bg-[#111]">Bank Transfer</option>
@@ -179,9 +179,9 @@ export default function EditRentalPageClient({
                     </div>
 
                     <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="p-6 bg-orange/5 border border-orange/20 rounded-2xl">
-                            <p className="text-xs font-medium uppercase tracking-widest text-orange/60 mb-1">Total Valuation</p>
-                            <p className="text-3xl font-bold tracking-tight text-orange uppercase">{formatMAD(totalPrice)}</p>
+                        <div className="p-6 bg-primary/5 border border-primary/20 rounded-2xl">
+                            <p className="text-xs font-medium uppercase tracking-widest text-primary/60 mb-1">Total Valuation</p>
+                            <p className="text-3xl font-bold tracking-tight text-primary uppercase">{formatMAD(totalPrice)}</p>
                         </div>
 
                         <div className={`p-6 border rounded-2xl ${derivedPaymentStatus === 'paid' ? 'bg-green-500/5 border-green-500/20' : 'bg-green-500/5 border-green-500/20'}`}>
@@ -202,7 +202,7 @@ export default function EditRentalPageClient({
                             rows={3}
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                            className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                             placeholder="Register any specific observations..."
                         />
                     </div>
@@ -212,7 +212,7 @@ export default function EditRentalPageClient({
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex-1 bg-orange text-white font-semibold py-5 rounded-xl hover:bg-orange/90 transition-all duration-300 orange-glow uppercase tracking-wider text-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                        className="flex-1 bg-primary text-white font-semibold py-5 rounded-xl hover:bg-primary/90 transition-all duration-300 primary-glow uppercase tracking-wider text-sm disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                         {loading ? 'Saving...' : (
                             <>

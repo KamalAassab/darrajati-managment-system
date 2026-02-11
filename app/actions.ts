@@ -132,13 +132,12 @@ export async function createScooter(prevState: any, formData: FormData): Promise
             try {
                 const fs = await import('fs/promises');
                 const path = await import('path');
-                const sharp = (await import('sharp')).default;
-
                 const buffer = Buffer.from(await imageFile.arrayBuffer());
-                const webpBuffer = await sharp(buffer)
-                    .resize(800, 800, { fit: 'inside' })
-                    .webp({ quality: 80 })
-                    .toBuffer();
+
+                // NO OPTIMIZATION: Save raw buffer
+                // We'll keep the filename extension as .webp for compatibility with existing DB entries
+                // even though it might be a jpeg/png. Browsers usually handle this.
+                const webpBuffer = buffer;
 
                 const publicPath = path.join(process.cwd(), 'public');
                 const fileName = `${slug.toUpperCase()}.webp`;
@@ -218,8 +217,6 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
             try {
                 const fs = await import('fs/promises');
                 const path = await import('path');
-                const sharp = (await import('sharp')).default;
-
                 // Generate slug from name for the filename
                 const name = formData.get('name') as string;
                 const slug = name
@@ -229,11 +226,9 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
                     .replace(/\s+/g, '-')
                     .replace(/-+/g, '-');
 
+                // NO OPTIMIZATION: Save raw buffer
                 const buffer = Buffer.from(await imageFile.arrayBuffer());
-                const webpBuffer = await sharp(buffer)
-                    .resize(800, 800, { fit: 'inside' })
-                    .webp({ quality: 80 })
-                    .toBuffer();
+                const webpBuffer = buffer;
 
                 const publicPath = path.join(process.cwd(), 'public');
                 const fileName = `${slug.toUpperCase()}.webp`;
@@ -868,7 +863,7 @@ export async function updateRental(id: string, formData: FormData): Promise<Acti
                 amount_paid = ${validatedData.amountPaid},
                 payment_status = ${validatedData.paymentStatus},
                 payment_method = ${validatedData.paymentMethod},
-                notes = ${validatedData.notes},
+                notes = ${validatedData.notes ?? null},
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ${id}
         `;
@@ -1184,7 +1179,7 @@ export async function addRentalPayment(rentalId: string, amount: number, date: s
         // 1. Insert Payment
         await sql`
             INSERT INTO rental_payments (rental_id, amount, date, notes)
-            VALUES (${rentalId}, ${amount}, ${date}, ${notes})
+            VALUES (${rentalId}, ${amount}, ${date}, ${notes ?? null})
         `;
 
         // 2. Update Rental Totals

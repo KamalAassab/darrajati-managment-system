@@ -36,7 +36,7 @@ export function ConfirmModal({
     const getIcon = () => {
         switch (type) {
             case 'danger': return <AlertTriangle className="w-6 h-6 text-red-500" />;
-            case 'warning': return <AlertTriangle className="w-6 h-6 text-orange" />;
+            case 'warning': return <AlertTriangle className="w-6 h-6 text-primary" />;
             case 'success': return <CheckCircle2 className="w-6 h-6 text-green-500" />;
             case 'info':
             default: return <Info className="w-6 h-6 text-blue-500" />;
@@ -46,7 +46,7 @@ export function ConfirmModal({
     const getConfirmButtonStyle = () => {
         switch (type) {
             case 'danger': return 'bg-red-500 text-white hover:bg-red-600';
-            case 'warning': return 'bg-orange text-white hover:bg-orange/90';
+            case 'warning': return 'bg-primary text-white hover:bg-primary/90';
             case 'success': return 'bg-green-500 text-white hover:bg-green-600';
             case 'info':
             default: return 'bg-blue-500 text-white hover:bg-blue-600';
@@ -55,7 +55,7 @@ export function ConfirmModal({
 
     return createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden scale-in-95 animate-in duration-200 orange-glow-border">
+            <div className="w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden scale-in-95 animate-in duration-200 primary-glow-border">
                 <div className="p-6 space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">

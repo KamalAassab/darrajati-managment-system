@@ -1,8 +1,8 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { neon } from '@neondatabase/serverless';
 import { authConfig } from './auth.config';
+import { sql } from '@/lib/db';
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
     ...authConfig,
@@ -50,8 +50,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
                 }
 
                 try {
-                    const sql = neon(process.env.DATABASE_URL!);
-
                     const users = await sql`
                         SELECT id, username, password_hash 
                         FROM admin_users 

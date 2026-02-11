@@ -4,8 +4,7 @@ import { useState, useMemo } from 'react';
 import { Scooter } from '@/types/admin';
 import { updateMaintenanceCountAction, deleteScooter } from '@/app/actions';
 import { formatMAD } from '@/lib/utils/currency';
-import { Trash2, Search, Filter, Hash, MoreHorizontal, Settings2, ChevronDown, Plus, Minus, Wrench } from 'lucide-react';
-import Image from 'next/image';
+import { Trash2, Search, Filter, Hash, MoreHorizontal, Settings2, ChevronDown, Plus, Minus, Wrench, CheckCircle2, Bike } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ScooterEditModal } from './ScooterEditModal';
 import { ConfirmModal } from './ConfirmModal';
@@ -16,7 +15,7 @@ interface AdminScootersTableProps {
 }
 
 const statusLabels: Record<string, string> = {
-    all: 'Filter',
+    all: 'All Assets',
     available: 'Available',
     rented: 'Rented',
     maintenance: 'Maintenance',
@@ -27,7 +26,7 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
     const [updating, setUpdating] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
-    const [editingScooter, setEditingScooter] = useState<Scooter | null>(null);
+    const [editingScooter, setEditingScooter] = useState<typeof scooters[0] | null>(null);
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
         title: string;
@@ -44,10 +43,18 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
     });
 
     const filteredScooters = useMemo(() => {
-        return scooters.filter(scooter => {
-            const matchesSearch =
-                scooter.name.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesStatus = statusFilter === 'all' || scooter.status === statusFilter;
+        return scooters.filter((scooter) => {
+            const matchesSearch = scooter.name
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase());
+
+            const matchesStatus =
+                statusFilter === 'all'
+                    ? true
+                    : statusFilter === 'maintenance'
+                        ? (scooter.maintenanceCount ?? 0) > 0
+                        : scooter.status === statusFilter;
+
             return matchesSearch && matchesStatus;
         });
     }, [scooters, searchTerm, statusFilter]);
@@ -128,9 +135,10 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                                     : 'text-white/50 hover:text-white hover:bg-white/5'}
                             `}
                         >
-                            {status === 'available' && <div className={`w-2 h-2 rounded-full bg-current ${statusFilter !== 'available' ? 'opacity-50' : 'opacity-100'}`} />}
-                            {status === 'rented' && <div className={`w-2 h-2 rounded-full bg-current ${statusFilter !== 'rented' ? 'opacity-50' : 'opacity-100'}`} />}
-                            {status === 'maintenance' && <Wrench className="w-3.5 h-3.5" />}
+                            {status === 'all' && <Filter className={`w-3.5 h-3.5 ${statusFilter !== 'all' ? 'text-white/40' : 'text-black/60'}`} />}
+                            {status === 'available' && <CheckCircle2 className={`w-3.5 h-3.5 ${statusFilter !== 'available' ? 'text-green-500/50' : 'text-white'}`} />}
+                            {status === 'rented' && <Bike className={`w-3.5 h-3.5 ${statusFilter !== 'rented' ? 'text-blue-500/50' : 'text-white'}`} />}
+                            {status === 'maintenance' && <Wrench className={`w-3.5 h-3.5 ${statusFilter !== 'maintenance' ? 'text-red-500/50' : 'text-white'}`} />}
                             {statusLabels[status] || status}
                         </button>
                     ))}
@@ -138,13 +146,13 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
 
                 {/* Search */}
                 <div className="relative w-full md:w-72 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-orange transition-colors" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-primary transition-colors" />
                     <input
                         type="text"
                         placeholder="Search scooters..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange/50 focus:ring-1 focus:ring-orange/20 transition-all font-medium placeholder:text-white/20 shadow-xl shadow-black/5"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-white/20 shadow-xl shadow-black/5"
                     />
                 </div>
             </div>
@@ -161,16 +169,16 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                     return (
                         <div
                             key={scooter.id}
-                            className="group relative bg-[#050505] border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-orange/50 transition-all duration-500 hover:shadow-[0_0_80px_-30px_rgba(255,107,0,0.4)] aspect-[4/5] flex flex-col"
+                            className="group relative bg-[#050505] border border-white/5 rounded-[2.5rem] overflow-hidden hover:border-primary/50 transition-all duration-500 hover:shadow-[0_0_80px_-30px_rgba(255,107,0,0.4)] aspect-[4/5] flex flex-col"
                         >
                             {/* Status Strip */}
                             <div className={`absolute top-0 left-0 w-full h-1.5 transition-colors duration-300 z-20 ${availableCount > 0 ? 'bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.5)]' :
-                                (maintenanceCount > 0 && availableCount === 0) ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]' : 'bg-orange shadow-[0_0_20px_rgba(255,107,0,0.5)]'
+                                (maintenanceCount > 0 && availableCount === 0) ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]' : 'bg-primary shadow-[0_0_20px_rgba(255,107,0,0.5)]'
                                 }`} />
 
                             {/* Header: ID & Actions */}
                             <div className="absolute top-6 left-6 right-6 z-30 flex justify-between items-start">
-                                <div className="flex items-center justify-center w-14 h-14 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl group-hover:border-orange/50 transition-colors shadow-xl">
+                                <div className="flex items-center justify-center w-14 h-14 bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl group-hover:border-primary/50 transition-colors shadow-xl">
                                     <span className="font-anton text-2xl text-white tracking-wider">
                                         {String(index + 1).padStart(2, '0')}
                                     </span>
@@ -186,7 +194,7 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                                                 onClick={() => onEdit ? onEdit(scooter) : setEditingScooter(scooter)}
                                                 className="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-white/5 rounded-xl transition-colors text-left"
                                             >
-                                                <Settings2 className="w-4 h-4 text-orange" /> Edit
+                                                <Settings2 className="w-4 h-4 text-primary" /> Edit
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(scooter.id)}
@@ -202,13 +210,10 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                             {/* Image Section (Expands to fill available space) */}
                             <div className="relative flex-1 bg-gradient-to-b from-white/5 to-transparent p-6 flex items-center justify-center overflow-hidden">
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                                <Image
+                                <img
                                     src={scooter.image}
                                     alt={scooter.name}
-                                    fill
-                                    className="object-contain drop-shadow-2xl z-10 img-premium"
-                                    sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                    quality={85}
+                                    className="absolute inset-0 w-full h-full object-contain drop-shadow-2xl z-10 img-premium"
                                 />
                             </div>
 
@@ -227,7 +232,7 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
                                     <div className="flex flex-col items-center flex-1">
-                                        <span className="text-[9px] font-bold text-orange uppercase tracking-widest mb-1">Rented</span>
+                                        <span className="text-[9px] font-bold text-primary uppercase tracking-widest mb-1">Rented</span>
                                         <span className="font-anton text-xl text-white">{rentedCount}</span>
                                     </div>
                                     <div className="w-px h-6 bg-white/10" />
@@ -259,8 +264,8 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                                 <div className="flex items-center justify-between px-2">
                                     <div className="flex flex-col">
                                         <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-1">Price / Day</span>
-                                        <span className="font-price text-2xl text-orange text-glow-orange tracking-tight">
-                                            {formatMAD(scooter.price).replace('MAD', '').trim()} <span className="text-xs text-orange/50">MAD</span>
+                                        <span className="font-price text-2xl text-primary text-glow-primary tracking-tight">
+                                            {formatMAD(scooter.price).replace('MAD', '').trim()} <span className="text-xs text-primary/50">MAD</span>
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-end">
@@ -277,7 +282,7 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
 
 
                 {filteredScooters.length === 0 && (
-                    <div className="col-span-full py-20 text-center glass-panel rounded-3xl">
+                    <div className="col-span-full glass-panel rounded-3xl text-center py-10 sm:py-16 md:py-20 px-6">
                         <Search className="w-12 h-12 text-white/10 mx-auto mb-4" />
                         <p className="text-white/30 text-sm font-bold uppercase tracking-widest">No scooters found</p>
                     </div>

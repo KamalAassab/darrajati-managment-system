@@ -1,0 +1,47 @@
+
+> darrajati-management@1.0.0 build
+> next build
+
+Ôû▓ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local
+- Experiments (use with caution):
+  ┬À serverActions
+
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 10.7s
+  Running TypeScript ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/9) ...
+Get current user error: Error: NEXT_REDIRECT
+    at i (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\_9ed2d5e7._.js:425:61821)
+    at j (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\_9ed2d5e7._.js:425:61999)
+    at ce (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\_9ed2d5e7._.js:447:506)
+    at async nc (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\_9ed2d5e7._.js:758:1219)
+    at async e (K:\Private\SOFTWARE ENGINEERING\darrajati-v2\Managment-System\.next\server\chunks\ssr\_fe3aac6f._.js:1:1332) {
+  digest: 'NEXT_REDIRECT;replace;/login;307;'
+}
+  Generating static pages using 7 workers (2/9) 
+  Generating static pages using 7 workers (4/9) 
+  Generating static pages using 7 workers (6/9) 
+Ô£ô Generating static pages using 7 workers (9/9) in 459.1ms
+  Finalizing page optimization ...
+
+Route (app)
+Ôöî Ôùï /
+Ôö£ Ôùï /_not-found
+Ôö£ ãÆ /dashboard
+Ôö£ ãÆ /dashboard/clients
+Ôö£ ãÆ /dashboard/finances
+Ôö£ ãÆ /dashboard/overdues
+Ôö£ ãÆ /dashboard/rentals
+Ôö£ ãÆ /dashboard/rentals/[id]/edit
+Ôö£ ãÆ /dashboard/rentals/new
+Ôö£ ãÆ /dashboard/scooters
+Ôöö ãÆ /dashboard/settings
+
+
+ãÆ Proxy (Middleware)
+
+Ôùï  (Static)   prerendered as static content
+ãÆ  (Dynamic)  server-rendered on demand
+

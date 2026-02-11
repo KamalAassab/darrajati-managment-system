@@ -20,7 +20,7 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
     return (
         <div className={`group/rental relative bg-[#0a0a0a] border rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col ${overdue
             ? 'border-red-500/50 shadow-[0_0_30px_-10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_50px_-10px_rgba(239,68,68,0.4)]'
-            : 'border-white/10 hover:border-orange/50 hover:shadow-orange/5'
+            : 'border-white/10 hover:border-primary/50 hover:shadow-primary/5'
             }`}>
             {/* Overdue Alert Strip */}
             {overdue && (
@@ -30,7 +30,7 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
             {/* Header */}
             <div className={`p-5 pb-0 flex justify-between items-start relative z-10 ${overdue ? 'bg-gradient-to-b from-red-500/10 to-transparent' : ''}`}>
                 <div>
-                    <h3 className="text-lg font-black font-outfit text-white uppercase tracking-tight truncate max-w-[180px] group-hover/rental:text-orange transition-colors">
+                    <h3 className="text-lg font-black font-outfit text-white uppercase tracking-tight truncate max-w-[180px] group-hover/rental:text-primary transition-colors">
                         {rental.client.fullName}
                     </h3>
                     <div className="flex items-center gap-1.5 mt-1">
@@ -61,13 +61,13 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
                 {/* Scooter & Dates Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div className="sm:col-span-2 bg-white/[0.03] rounded-xl p-3 border border-white/[0.03] flex items-center gap-3 group/scooter">
-                        <Bike className="w-5 h-5 text-orange group-hover/scooter:scale-110 transition-transform" />
+                        <Bike className="w-5 h-5 text-primary group-hover/scooter:scale-110 transition-transform" />
                         <p className="text-sm font-bold text-white tracking-wide">{rental.scooter.name}</p>
                     </div>
 
                     <div className={`sm:col-span-2 bg-white/[0.03] rounded-xl p-3 border ${overdue ? 'border-red-500/30 bg-red-500/5' : 'border-white/[0.03]'}`}>
                         <div className={`flex items-center gap-3 ${overdue ? 'text-red-400' : 'text-white/80'}`}>
-                            <Calendar className="w-5 h-5 text-orange" />
+                            <Calendar className="w-5 h-5 text-primary" />
                             <span className="text-xs font-black tracking-tight">
                                 {formatDateShort(rental.startDate)}
                                 <span className="mx-2 text-white/20">→</span>

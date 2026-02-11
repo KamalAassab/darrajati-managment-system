@@ -12,12 +12,12 @@ interface ClientCardProps {
 
 export function ClientCard({ client, onEdit, onDelete }: ClientCardProps) {
     return (
-        <div className="group relative bg-[#0a0a0a] border border-white/10 hover:border-orange/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-orange/5 flex flex-col">
+        <div className="group relative bg-[#0a0a0a] border border-white/10 hover:border-primary/50 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-primary/5 flex flex-col">
             {/* Header with Name & Status */}
             <div className="p-5 pb-0">
                 <div className="flex justify-between items-start gap-3">
                     <div className='flex-1 min-w-0'>
-                        <h3 className="text-lg font-black font-outfit text-white uppercase tracking-tight truncate group-hover:text-orange transition-colors">
+                        <h3 className="text-lg font-black font-outfit text-white uppercase tracking-tight truncate group-hover:text-primary transition-colors">
                             {client.fullName}
                         </h3>
                         {/* Status Inline - Subtitle */}

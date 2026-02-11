@@ -13,7 +13,7 @@ const AnalyticsChart = dynamic(() => import('./components/AnalyticsChart'), {
 const TopScooters = dynamic(() => import('./components/TopScooters'), {
     loading: () => <div className="h-[300px] bg-white/5 animate-pulse rounded-2xl" />,
 });
-import SmartTips from './components/SmartTips';
+
 
 export default function DashboardClient({
     stats,
@@ -30,8 +30,8 @@ export default function DashboardClient({
         <div className="space-y-6 pb-10">
             {/* Header */}
             <div>
-                <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3">
-                    <Activity className="w-6 h-6 md:w-8 md:h-8 text-orange" />
+                <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton">
+                    <Activity className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                     Dashboard
                 </h1>
             </div>
@@ -88,13 +88,13 @@ export default function DashboardClient({
 
                 {/* Recent Activity */}
                 < div className="lg:col-span-2 bg-[#050505] border border-white/[0.03] rounded-[2rem] p-6 relative overflow-hidden" >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-orange/5 rounded-full blur-[100px] -mr-32 -mt-32" />
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32" />
 
                     <div className="flex justify-between items-center mb-6 relative z-10 px-2">
                         <div>
                             <h3 className="text-xl text-white uppercase font-bold">Operation Stream</h3>
                         </div>
-                        <Link href="/dashboard/rentals" className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-orange transition-all flex items-center gap-2 group border border-white/5 px-3 py-1.5 rounded-lg hover:border-orange/30">
+                        <Link href="/dashboard/rentals" className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-primary transition-all flex items-center gap-2 group border border-white/5 px-3 py-1.5 rounded-lg hover:border-primary/30">
                             View All <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                         </Link>
                     </div>
@@ -115,13 +115,13 @@ export default function DashboardClient({
 
                                     return (
                                         <tr key={rental.id} className="group transition-all">
-                                            <td className="py-4 pl-4 bg-white/[0.02] rounded-l-2xl border-y border-l border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-orange/20 transition-all">
+                                            <td className="py-4 pl-4 bg-white/[0.02] rounded-l-2xl border-y border-l border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-primary/20 transition-all">
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-white text-base tracking-tight group-hover:text-orange transition-colors">{rental.client.fullName}</span>
+                                                    <span className="font-bold text-white text-base tracking-tight group-hover:text-primary transition-colors">{rental.client.fullName}</span>
                                                     <span className="text-xs font-medium text-white/40 uppercase tracking-tighter mt-0.5">{rental.scooter.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="py-4 bg-white/[0.02] border-y border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-orange/20 transition-all hidden md:table-cell">
+                                            <td className="py-4 bg-white/[0.02] border-y border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-primary/20 transition-all hidden md:table-cell">
                                                 <div className="flex flex-col gap-0.5">
                                                     <div className="flex items-center gap-2">
                                                         <span className="text-xs font-bold text-white/60 tracking-tighter">{new Date(rental.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })}</span>
@@ -130,12 +130,12 @@ export default function DashboardClient({
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="py-4 bg-white/[0.02] border-y border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-orange/20 transition-all text-center hidden lg:table-cell">
+                                            <td className="py-4 bg-white/[0.02] border-y border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-primary/20 transition-all text-center hidden lg:table-cell">
                                                 <span className="inline-flex items-center text-sm font-black text-white/50 uppercase tracking-tight">
                                                     {days} {days === 1 ? 'day' : 'days'}
                                                 </span>
                                             </td>
-                                            <td className="py-4 pr-4 bg-white/[0.02] rounded-r-2xl border-y border-r border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-orange/20 transition-all text-right">
+                                            <td className="py-4 pr-4 bg-white/[0.02] rounded-r-2xl border-y border-r border-white/[0.03] group-hover:bg-white/[0.04] group-hover:border-primary/20 transition-all text-right">
                                                 <div className="flex flex-col items-end">
                                                     <span className="font-outfit text-white text-base font-bold tracking-tight">{formatMAD(rental.totalPrice)}</span>
                                                     <span className={`text-[10px] font-black uppercase tracking-[0.2em] mt-1 ${rental.status === 'active' ? 'text-green-500' :

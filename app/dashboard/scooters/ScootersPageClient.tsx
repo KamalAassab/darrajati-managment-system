@@ -21,17 +21,17 @@ export default function ScootersPageClient({ initialScooters }: { initialScooter
     };
 
     return (
-        <div className="space-y-10 font-alexandria">
+        <div className="space-y-10 font-outfit">
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3">
-                        <Bike className="w-6 h-6 md:w-8 md:h-8 text-orange" />
+                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton">
+                        <Bike className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                         Scooters Management
                     </h1>
                 </div>
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="bg-orange text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
+                    className="bg-primary text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-primary/20"
                 >
                     <Plus className="w-6 h-6 md:w-5 md:h-5" />
                     <span className="hidden md:inline">Add New Scooter</span>

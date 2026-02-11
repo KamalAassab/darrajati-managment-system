@@ -54,12 +54,12 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
     const completedCount = completedRentals.length;
 
     return (
-        <div className="space-y-8 pb-20 font-alexandria">
+        <div className="space-y-8 pb-20 font-outfit">
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
-                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3">
-                        <Activity className="w-6 h-6 md:w-8 md:h-8 text-orange" />
+                    <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton">
+                        <Activity className="w-6 h-6 md:w-8 md:h-8 text-primary" />
                         Rentals
                     </h1>
                 </div>
@@ -68,7 +68,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                     {/* Create Button */}
                     <Link
                         href="/dashboard/rentals/new"
-                        className="bg-orange text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-orange/90 transition-all duration-300 orange-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-orange/20"
+                        className="bg-primary text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-primary/20"
                     >
                         <Plus className="w-5 h-5" />
                         <span>Create Rental</span>
@@ -106,7 +106,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                         <Activity className="w-4 h-4" />
                         Active
                         <span className={cn(
-                            "text-[10px] px-1.5 py-0.5 rounded-full ml-1",
+                            "text-[9px] w-5 h-5 flex items-center justify-center rounded-full ml-1.5 font-bold transition-colors",
                             statusFilter === 'active' ? "bg-white/20 text-white" : "bg-white/10 text-white/60"
                         )}>{activeCount}</span>
                     </button>
@@ -123,7 +123,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                         Overdue
                         {overdueCount > 0 && (
                             <span className={cn(
-                                "text-[10px] px-1.5 py-0.5 rounded-full ml-1",
+                                "text-[9px] w-5 h-5 flex items-center justify-center rounded-full ml-1.5 font-bold transition-colors",
                                 statusFilter === 'overdue' ? "bg-white/20 text-white" : "bg-red-500/20 text-red-200"
                             )}>{overdueCount}</span>
                         )}
@@ -140,7 +140,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                         <CheckCircle2 className="w-4 h-4" />
                         Completed
                         <span className={cn(
-                            "text-[10px] px-1.5 py-0.5 rounded-full ml-1",
+                            "text-[9px] w-5 h-5 flex items-center justify-center rounded-full ml-1.5 font-bold transition-colors",
                             statusFilter === 'completed' ? "bg-white/20 text-white" : "bg-white/10 text-white/60"
                         )}>{completedCount}</span>
                     </button>
@@ -148,20 +148,20 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
 
                 {/* Search */}
                 <div className="relative w-full md:w-72 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-orange transition-colors" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30 group-focus-within:text-primary transition-colors" />
                     <input
                         type="text"
                         placeholder="Search client, scooter..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-orange/50 focus:ring-1 focus:ring-orange/20 transition-all font-medium placeholder:text-white/20 shadow-xl shadow-black/5"
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 transition-all font-medium placeholder:text-white/20 shadow-xl shadow-black/5"
                     />
                 </div>
             </div>
 
             {/* Content Area */}
             {filteredRentals.length === 0 ? (
-                <div className="glass-panel p-16 rounded-3xl text-center border-dashed border-white/10 flex flex-col items-center justify-center min-h-[400px]">
+                <div className="glass-panel rounded-3xl text-center border-dashed border-white/10 flex flex-col items-center justify-center p-8 sm:p-12 md:p-16 min-h-[260px] sm:min-h-[320px] md:min-h-[400px] w-full">
                     <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6">
                         {statusFilter === 'overdue' ? (
                             <Clock className="w-8 h-8 text-white/20" />
@@ -179,7 +179,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 animate-in slide-in-from-bottom-4 duration-500">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 animate-in slide-in-from-bottom-4 duration-500">
                     {filteredRentals.map((rental) => (
                         <RentalCard
                             key={rental.id}

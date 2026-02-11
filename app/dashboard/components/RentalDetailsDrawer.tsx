@@ -6,7 +6,6 @@ import { formatDate, formatMAD, isOverdue } from '@/lib/utils/currency';
 import CompleteRentalButton from '@/app/dashboard/rentals/components/CompleteRentalButton';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Image from 'next/image';
 
 interface RentalDetailsDrawerProps {
     rental: RentalWithDetails | null;
@@ -72,7 +71,7 @@ export function RentalDetailsDrawer({ rental, onClose, isOpen }: RentalDetailsDr
                             {/* Section: Client */}
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <User className="w-3 h-3 text-orange" />
+                                    <User className="w-3 h-3 text-primary" />
                                     <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Client Information</h3>
                                 </div>
                                 <div className="glass-panel p-4 rounded-xl space-y-3">
@@ -93,7 +92,7 @@ export function RentalDetailsDrawer({ rental, onClose, isOpen }: RentalDetailsDr
                             {/* Section: Scooter */}
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <Bike className="w-3 h-3 text-orange" />
+                                    <Bike className="w-3 h-3 text-primary" />
                                     <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Asset Information</h3>
                                 </div>
                                 <div className="glass-panel p-4 rounded-xl flex items-center gap-4 relative overflow-hidden group">
@@ -101,11 +100,10 @@ export function RentalDetailsDrawer({ rental, onClose, isOpen }: RentalDetailsDr
                                         {imageError ? (
                                             <Bike className="w-8 h-8 text-white/20" />
                                         ) : (
-                                            <Image
+                                            <img
                                                 src={rental.scooter.image}
                                                 alt={rental.scooter.name}
-                                                fill
-                                                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                                                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                                 onError={() => setImageError(true)}
                                             />
                                         )}
@@ -119,7 +117,7 @@ export function RentalDetailsDrawer({ rental, onClose, isOpen }: RentalDetailsDr
                             {/* Section: Financials */}
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <CreditCard className="w-3 h-3 text-orange" />
+                                    <CreditCard className="w-3 h-3 text-primary" />
                                     <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Financial Details</h3>
                                 </div>
                                 <div className="glass-panel p-4 rounded-xl space-y-3">
@@ -143,7 +141,7 @@ export function RentalDetailsDrawer({ rental, onClose, isOpen }: RentalDetailsDr
                             {/* Section: Timeline */}
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 mb-1">
-                                    <Calendar className="w-3 h-3 text-orange" />
+                                    <Calendar className="w-3 h-3 text-primary" />
                                     <h3 className="text-[10px] font-black text-white/50 uppercase tracking-[0.2em]">Timeline</h3>
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
@@ -163,7 +161,7 @@ export function RentalDetailsDrawer({ rental, onClose, isOpen }: RentalDetailsDr
                         <div className="p-6 border-t border-white/10 bg-black/40 backdrop-blur-md">
                             <CompleteRentalButton
                                 rentalId={rental.id}
-                                className="w-full bg-orange hover:bg-orange/90 text-white p-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold uppercase tracking-widest shadow-lg shadow-orange/20 hover:shadow-orange/40 hover:-translate-y-1"
+                                className="w-full bg-primary hover:bg-primary/90 text-white p-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-3 font-bold uppercase tracking-widest shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-1"
                             />
                         </div>
                     </div>

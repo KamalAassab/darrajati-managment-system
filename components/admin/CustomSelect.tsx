@@ -64,7 +64,7 @@ export function CustomSelect({
                 type="button"
                 onClick={() => !disabled && setIsOpen(!isOpen)}
                 disabled={disabled}
-                className={`w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium transition-all outline-none focus:ring-2 focus:ring-orange/30 disabled:opacity-50 disabled:cursor-not-allowed ${isOpen ? 'ring-2 ring-orange/30 border-orange/50' : 'hover:bg-white/10'}`}
+                className={`w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium transition-all outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed ${isOpen ? 'ring-2 ring-primary/30 border-primary/50' : 'hover:bg-white/10'}`}
             >
                 <span className={`flex items-center gap-2 ${!selectedOption ? 'text-white/30' : ''}`}>
                     {selectedOption ? (
@@ -99,7 +99,7 @@ export function CustomSelect({
                                 {option.icon}
                                 {option.label}
                             </span>
-                            {value === option.value && <Check className="w-4 h-4 text-orange" />}
+                            {value === option.value && <Check className="w-4 h-4 text-primary" />}
                         </button>
                     ))}
                     {options.length === 0 && (

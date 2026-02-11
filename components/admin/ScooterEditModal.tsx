@@ -49,7 +49,7 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
             <div className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto">
                 <div className="sticky top-0 z-10 flex items-center justify-between p-6 border-b border-white/5 bg-[#0a0a0a]/95 backdrop-blur">
                     <h2 className="text-xl font-anton uppercase tracking-wide text-white flex items-center gap-3">
-                        <Settings2 className="w-5 h-5 text-orange" />
+                        <Settings2 className="w-5 h-5 text-primary" />
                         Edit {scooter.name}
                     </h2>
                     <button onClick={onClose} className="p-2 text-white/50 hover:text-white transition-colors rounded-full hover:bg-white/5">
@@ -61,11 +61,11 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Basic Info */}
                         <div className="space-y-4">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-orange mb-2">Basic Info</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Basic Info</h3>
 
                             <div>
                                 <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Scooter Name</label>
-                                <input name="name" defaultValue={scooter.name} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors" />
+                                <input name="name" defaultValue={scooter.name} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors" />
                             </div>
 
 
@@ -73,19 +73,19 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
                             <div>
                                 <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Daily Price</label>
                                 <div className="relative">
-                                    <input name="price" type="number" min="0" defaultValue={extractNumber(scooter.price)} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors pr-12 appearance-none hide-number-spinner" />
+                                    <input name="price" type="number" min="0" defaultValue={extractNumber(scooter.price)} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors pr-12 appearance-none hide-number-spinner" />
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-white/30 pointer-events-none">MAD</span>
                                 </div>
                             </div>
 
                             <div>
                                 <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Quantity</label>
-                                <input name="quantity" type="number" min="1" defaultValue={scooter.quantity || 1} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors appearance-none hide-number-spinner" />
+                                <input name="quantity" type="number" min="1" defaultValue={scooter.quantity || 1} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors appearance-none hide-number-spinner" />
                             </div>
 
                             <div>
                                 <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Status</label>
-                                <select name="status" defaultValue={scooter.status} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors appearance-none">
+                                <select name="status" defaultValue={scooter.status} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors appearance-none">
                                     <option value="available" className="bg-black text-white">Available</option>
                                     <option value="rented" className="bg-black text-white">Rented</option>
                                     <option value="maintenance" className="bg-black text-white">Maintenance</option>
@@ -95,7 +95,7 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
 
                         {/* Specs */}
                         <div className="space-y-4">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-orange mb-2">Specifications</h3>
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Specifications</h3>
 
                             <div>
                                 <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Engine</label>
@@ -112,7 +112,7 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
                                         </>
                                     ) : (
                                         <>
-                                            <input name="engine" type="number" min="0" defaultValue={extractNumber(scooter.engine)} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors pr-12 appearance-none hide-number-spinner" />
+                                            <input name="engine" type="number" min="0" defaultValue={extractNumber(scooter.engine)} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors pr-12 appearance-none hide-number-spinner" />
                                             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-white/30 pointer-events-none">CC</span>
                                         </>
                                     )}
@@ -122,7 +122,7 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
                             <div>
                                 <label className="block text-[10px] font-bold uppercase text-white/40 mb-1.5">Speed</label>
                                 <div className="relative">
-                                    <input name="speed" type="number" min="0" defaultValue={extractNumber(scooter.speed)} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-orange/50 transition-colors pr-12 appearance-none hide-number-spinner" />
+                                    <input name="speed" type="number" min="0" defaultValue={extractNumber(scooter.speed)} required className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors pr-12 appearance-none hide-number-spinner" />
                                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-white/30 pointer-events-none">KM/H</span>
                                 </div>
                             </div>
@@ -133,7 +133,7 @@ export function ScooterEditModal({ scooter, isOpen, onClose }: ScooterEditModalP
                         <button type="button" onClick={onClose} className="px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-white hover:bg-white/5 transition-colors">
                             Cancel
                         </button>
-                        <button type="submit" disabled={isSubmitting} className="px-8 py-3 rounded-xl bg-orange text-black text-xs font-bold uppercase tracking-wider hover:bg-orange/90 transition-colors disabled:opacity-50 flex items-center gap-2">
+                        <button type="submit" disabled={isSubmitting} className="px-8 py-3 rounded-xl bg-primary text-black text-xs font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center gap-2">
                             {isSubmitting ? <span className="animate-spin text-xl">⟳</span> : <Save className="w-4 h-4" />}
                             Save Changes
                         </button>

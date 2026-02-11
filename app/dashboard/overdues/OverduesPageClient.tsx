@@ -14,7 +14,7 @@ export default function OverduesPageClient({ overdueRentals }: OverduesPageClien
     const [selectedRental, setSelectedRental] = useState<RentalWithDetails | null>(null);
 
     return (
-        <div className="space-y-8 pb-20 font-alexandria">
+        <div className="space-y-8 pb-20 font-outfit">
             {/* Header */}
             <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">

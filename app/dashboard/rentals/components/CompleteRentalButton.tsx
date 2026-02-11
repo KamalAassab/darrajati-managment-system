@@ -57,7 +57,7 @@ export default function CompleteRentalButton({ rentalId, compact = false, classN
             <button
                 onClick={handleComplete}
                 disabled={loading}
-                className={className || `w-full bg-orange hover:bg-orange/90 text-white ${compact ? 'p-1.5 text-[10px]' : 'p-3'} rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn shadow-[0_0_20px_-5px_#FF4500] flex-1 disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={className || `w-full bg-primary hover:bg-primary/90 text-white ${compact ? 'p-1.5 text-[10px]' : 'p-3'} rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn shadow-[0_0_20px_-5px_#FF4500] flex-1 disabled:opacity-50 disabled:cursor-not-allowed`}
                 title="Complete Rental"
             >
                 {loading ? (

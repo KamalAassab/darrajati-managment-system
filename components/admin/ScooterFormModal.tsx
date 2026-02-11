@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { createScooter, updateScooter } from '@/app/actions';
 import { Scooter } from '@/types/admin';
 import { X, Upload, Loader2, Wrench } from 'lucide-react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 interface ScooterFormModalProps {
@@ -122,17 +121,16 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                             />
                             <label
                                 htmlFor="image-upload"
-                                className="block w-full aspect-video border-2 border-dashed border-white/20 rounded-2xl overflow-hidden cursor-pointer hover:border-orange/50 transition-colors relative group"
+                                className="block w-full aspect-video border-2 border-dashed border-white/20 rounded-2xl overflow-hidden cursor-pointer hover:border-primary/50 transition-colors relative group"
                             >
                                 {imagePreview ? (
-                                    <Image
+                                    <img
                                         src={imagePreview}
                                         alt="Preview"
-                                        fill
-                                        className="object-contain"
+                                        className="absolute inset-0 w-full h-full object-contain"
                                     />
                                 ) : (
-                                    <div className="flex flex-col items-center justify-center h-full text-white/40 group-hover:text-orange/70 transition-colors">
+                                    <div className="flex flex-col items-center justify-center h-full text-white/40 group-hover:text-primary/70 transition-colors">
                                         <Upload className="w-12 h-12 mb-2" />
                                         <span className="text-sm font-semibold">Click to upload</span>
                                     </div>
@@ -152,7 +150,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 name="name"
                                 defaultValue={scooter?.name}
                                 required
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                 placeholder="Scooter Name"
                             />
                         </div>
@@ -166,7 +164,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 name="engine"
                                 defaultValue={scooter?.engine}
                                 required
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                 placeholder="125"
                             />
                         </div>
@@ -180,7 +178,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 name="speed"
                                 defaultValue={scooter?.speed}
                                 required
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                 placeholder="90"
                             />
                         </div>
@@ -194,7 +192,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 name="price"
                                 defaultValue={scooter?.price}
                                 required
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                 placeholder="200"
                             />
                         </div>
@@ -209,7 +207,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 defaultValue={scooter?.quantity || 1}
                                 min="1"
                                 required
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                 placeholder="1"
                             />
                         </div>
@@ -224,7 +222,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                                 value={maintenanceCount}
                                 onChange={(e) => setMaintenanceCount(Number(e.target.value))}
                                 min="0"
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-orange/50"
+                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                 placeholder="0"
                             />
                         </div>
@@ -243,7 +241,7 @@ export function ScooterFormModal({ isOpen, onClose, scooter }: ScooterFormModalP
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-1 px-6 py-3 bg-orange hover:bg-orange/90 disabled:bg-orange/50 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+                            className="flex-1 px-6 py-3 bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
                         >
                             {isSubmitting && <Loader2 className="w-5 h-5 animate-spin" />}
                             {isEdit ? 'Update Scooter' : 'Create Scooter'}

@@ -42,9 +42,9 @@ export function RentalStats({ activeRentals, completedRentals }: RentalStatsProp
             label: 'Total Revenue',
             value: formatMAD(totalRevenue),
             icon: TrendingUp,
-            color: 'text-orange',
-            bg: 'bg-orange/10',
-            border: 'border-orange/20'
+            color: 'text-primary',
+            bg: 'bg-primary/10',
+            border: 'border-primary/20'
         },
         {
             label: 'Overdue',

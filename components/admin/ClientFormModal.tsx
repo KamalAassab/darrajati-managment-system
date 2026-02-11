@@ -91,7 +91,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                                 name="fullName"
                                 defaultValue={client?.fullName}
                                 required
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                 placeholder="Enter client name"
                             />
                         </div>
@@ -103,7 +103,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                                 name="documentId"
                                 defaultValue={client?.documentId}
                                 required
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                 placeholder="e.g. AB123456"
                             />
                         </div>
@@ -115,7 +115,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                                 name="phone"
                                 defaultValue={client?.phone}
                                 required
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                 placeholder="+212 6..."
                             />
                         </div>
@@ -136,7 +136,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-[2] py-4 bg-orange hover:bg-orange/90 text-white rounded-xl font-bold uppercase tracking-wide transition-all orange-glow flex items-center justify-center gap-2"
+                            className="flex-[2] py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold uppercase tracking-wide transition-all primary-glow flex items-center justify-center gap-2"
                         >
                             {isSubmitting ? (
                                 <>

@@ -127,7 +127,7 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
                         </div>
                         <div className="bg-black/40 p-3 rounded-xl border border-white/5">
                             <span className="text-[10px] uppercase text-white/40 font-bold block mb-1">Remaining</span>
-                            <span className="text-lg font-bold text-orange">{formatMAD(remaining)}</span>
+                            <span className="text-lg font-bold text-primary">{formatMAD(remaining)}</span>
                         </div>
                     </div>
                     {/* Progress Bar */}
@@ -146,7 +146,7 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
                     {isLoading ? (
                         <div className="flex justify-center py-8">
-                            <Loader2 className="w-8 h-8 text-orange animate-spin" />
+                            <Loader2 className="w-8 h-8 text-primary animate-spin" />
                         </div>
                     ) : payments.length === 0 ? (
                         <div className="text-center py-8 text-white/30">

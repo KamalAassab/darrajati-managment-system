@@ -103,7 +103,7 @@ export default function NewRentalPageClient({
                     {/* Client Information Section */}
                     <div className="space-y-6">
                         <h3 className="text-lg text-white font-bold uppercase tracking-wide flex items-center gap-3">
-                            <span className="w-8 h-[1px] bg-orange"></span>
+                            <span className="w-8 h-[1px] bg-primary"></span>
                             Client Information
                         </h3>
 
@@ -114,7 +114,7 @@ export default function NewRentalPageClient({
                                     type="text"
                                     name="clientFullName"
                                     required
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                     placeholder="e.g., John Doe"
                                 />
                             </div>
@@ -125,7 +125,7 @@ export default function NewRentalPageClient({
                                     type="text"
                                     name="clientDocumentId"
                                     required
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                     placeholder="G123456"
                                 />
                             </div>
@@ -136,7 +136,7 @@ export default function NewRentalPageClient({
                                     type="tel"
                                     name="clientPhone"
                                     required
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                     placeholder="0612345678"
                                 />
                             </div>
@@ -148,7 +148,7 @@ export default function NewRentalPageClient({
                     {/* Rental Details Section */}
                     <div className="space-y-6">
                         <h3 className="text-lg text-white font-bold uppercase tracking-wide flex items-center gap-3">
-                            <span className="w-8 h-[1px] bg-orange"></span>
+                            <span className="w-8 h-[1px] bg-primary"></span>
                             Rental Details
                         </h3>
 
@@ -173,7 +173,7 @@ export default function NewRentalPageClient({
                                     required
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all cursor-pointer"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all cursor-pointer"
                                 />
                             </div>
 
@@ -186,7 +186,7 @@ export default function NewRentalPageClient({
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
                                     min={startDate}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all cursor-pointer"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all cursor-pointer"
                                 />
                             </div>
 
@@ -204,7 +204,7 @@ export default function NewRentalPageClient({
                                             setAmountPaid(Math.max(0, parseInt(e.target.value) || 0));
                                             setIsAmountManuallyChanged(true);
                                         }}
-                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all"
+                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all"
                                         placeholder="0.00"
                                     />
                                     <span className="absolute right-5 top-1/2 -translate-y-1/2 text-[10px] font-bold text-white/20 uppercase tracking-widest">MAD</span>
@@ -226,13 +226,13 @@ export default function NewRentalPageClient({
 
                             <div className="space-y-2 pt-1 sm:col-span-2 md:col-span-1">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1 block mb-2">Security Deposit</label>
-                                <label className="relative flex items-center gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-orange/30 transition-all cursor-pointer group">
+                                <label className="relative flex items-center gap-3 p-4 bg-white/5 border border-white/10 rounded-xl hover:border-primary/30 transition-all cursor-pointer group">
                                     <input
                                         type="checkbox"
                                         name="hasGuarantee"
                                         className="peer sr-only"
                                     />
-                                    <div className="h-5 w-5 rounded border-2 border-white/20 bg-transparent transition-all peer-checked:border-orange peer-checked:bg-orange flex items-center justify-center">
+                                    <div className="h-5 w-5 rounded border-2 border-white/20 bg-transparent transition-all peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-3.5 w-3.5 text-black opacity-0 transition-opacity peer-checked:opacity-100 font-bold"
@@ -255,9 +255,9 @@ export default function NewRentalPageClient({
 
                         {totalPrice > 0 && (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4">
-                                <div className="p-6 bg-orange/5 border border-orange/20 rounded-2xl flex flex-col items-center justify-center text-center">
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-orange/60 mb-2">Total Price</p>
-                                    <p className="text-3xl font-anton text-orange">{formatMAD(totalPrice)}</p>
+                                <div className="p-6 bg-primary/5 border border-primary/20 rounded-2xl flex flex-col items-center justify-center text-center">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-primary/60 mb-2">Total Price</p>
+                                    <p className="text-3xl font-anton text-primary">{formatMAD(totalPrice)}</p>
                                 </div>
 
                                 <div className={`p-6 border rounded-2xl flex flex-col items-center justify-center text-center ${derivedPaymentStatus === 'paid' ? 'bg-green-500/5 border-green-500/20' : 'bg-green-500/5 border-green-500/20'}`}>
@@ -277,7 +277,7 @@ export default function NewRentalPageClient({
                             <textarea
                                 name="notes"
                                 rows={3}
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-orange/30 outline-none transition-all placeholder:text-white/10"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                 placeholder="Add any additional notes..."
                             />
                         </div>
@@ -293,7 +293,7 @@ export default function NewRentalPageClient({
                         <button
                             type="submit"
                             disabled={loading || !selectedScooter || !startDate || !endDate}
-                            className="flex-[2] bg-orange text-white font-bold py-4 rounded-xl hover:bg-orange/90 transition-all orange-glow uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-[2] bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-all primary-glow uppercase tracking-wide flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
                                 <>

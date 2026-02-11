@@ -4,7 +4,6 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, User, ShieldCheck, Eye, EyeOff } from 'lucide-react';
-import Image from 'next/image';
 import { authenticate } from '@/app/actions';
 
 function LoginButton() {
@@ -14,7 +13,7 @@ function LoginButton() {
         <button
             type="submit"
             disabled={pending}
-            className="w-full bg-orange text-white font-bold py-3 sm:py-4 rounded-2xl hover:bg-orange/90 transition-all duration-300 orange-glow active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-base sm:text-lg tracking-tight"
+            className="w-full bg-primary text-white font-bold py-3 sm:py-4 rounded-2xl hover:bg-primary/90 transition-all duration-300 primary-glow active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-base sm:text-lg tracking-tight"
         >
             {pending ? (
                 <>
@@ -53,18 +52,14 @@ function LoginForm() {
 
     return (
         <div className="w-full max-w-md relative z-10 px-4 sm:px-6 md:px-0">
-            <div className="glass-panel-dark rounded-3xl p-6 sm:p-8 md:p-10 orange-glow-border">
+            <div className="glass-panel-dark rounded-3xl p-6 sm:p-8 md:p-10 primary-glow-border">
                 <div className="flex justify-center mb-8 sm:mb-10">
                     <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 transition-all duration-300 hover:scale-105">
-                        <div className="absolute inset-0 bg-orange/20 blur-3xl rounded-full" />
-                        <Image
+                        <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+                        <img
                             src="/logo.webp"
                             alt="Darrajati Logo"
-                            fill
-                            className="object-contain drop-shadow-2xl relative z-10"
-                            priority
-                            sizes="(max-width: 640px) 192px, (max-width: 768px) 224px, 256px"
-                            quality={90}
+                            className="absolute inset-0 w-full h-full object-contain drop-shadow-2xl relative z-10"
                         />
                     </div>
                 </div>
@@ -84,14 +79,14 @@ function LoginForm() {
                         </label>
                         <div className="relative group">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <User className="w-5 h-5 text-muted-foreground group-focus-within:text-orange transition-colors" />
+                                <User className="w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             </div>
                             <input
                                 type="text"
                                 id="username"
                                 name="username"
                                 required
-                                className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-orange/50 focus:border-orange/50 outline-none transition-all duration-300"
+                                className="w-full pl-12 pr-4 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all duration-300"
                                 placeholder="Enter username"
                                 onChange={() => setUiError(null)}
                             />
@@ -104,14 +99,14 @@ function LoginForm() {
                         </label>
                         <div className="relative group">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <Lock className="w-5 h-5 text-muted-foreground group-focus-within:text-orange transition-colors" />
+                                <Lock className="w-5 h-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                             </div>
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 id="password"
                                 name="password"
                                 required
-                                className="w-full pl-12 pr-12 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-orange/50 focus:border-orange/50 outline-none transition-all duration-300"
+                                className="w-full pl-12 pr-12 py-3 sm:py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:ring-2 focus:ring-primary/50 focus:border-primary/50 outline-none transition-all duration-300"
                                 placeholder="••••••••"
                                 onChange={() => setUiError(null)}
                             />
@@ -144,9 +139,9 @@ export default function LoginPage() {
     return (
         <div className="min-h-screen flex items-center justify-center relative bg-black overflow-hidden font-inter p-4 sm:p-0">
             {/* Background elements */}
-            <div className="absolute inset-x-0 top-0 h-64 sm:h-96 bg-gradient-to-b from-orange/20 to-transparent pointer-events-none" />
-            <div className="absolute top-[-10%] left-[-10%] w-[50%] sm:w-[40%] h-[50%] sm:h-[40%] bg-orange/10 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] sm:w-[40%] h-[50%] sm:h-[40%] bg-orange/5 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none" />
+            <div className="absolute inset-x-0 top-0 h-64 sm:h-96 bg-gradient-to-b from-primary/20 to-transparent pointer-events-none" />
+            <div className="absolute top-[-10%] left-[-10%] w-[50%] sm:w-[40%] h-[50%] sm:h-[40%] bg-primary/10 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-[-10%] right-[-10%] w-[50%] sm:w-[40%] h-[50%] sm:h-[40%] bg-primary/5 blur-[80px] sm:blur-[100px] rounded-full pointer-events-none" />
             <div className="absolute inset-0 bg-cyber-grid opacity-30 pointer-events-none" />
 
             <Suspense fallback={<div className="text-white">Loading security gateway...</div>}>
