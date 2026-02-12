@@ -230,7 +230,7 @@ export default function AnalyticsChart({ data: initialData }: { data: any[] }) {
 
             <div className={`${isMobile ? 'h-[280px]' : 'h-[350px]'} w-full`}>
                 <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={chartData} margin={{ top: 20, right: isMobile ? 5 : 20, left: isMobile ? -20 : 10, bottom: 20 }}>
+                    <AreaChart data={chartData} margin={{ top: 20, right: isMobile ? 5 : 20, left: isMobile ? -30 : -10, bottom: 20 }}>
                         <defs>
                             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                                 <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
@@ -261,7 +261,7 @@ export default function AnalyticsChart({ data: initialData }: { data: any[] }) {
                             tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: isMobile ? 8 : 10, fontFamily: 'var(--font-outfit)', fontWeight: 500 }}
                             tickLine={false}
                             axisLine={false}
-                            width={isMobile ? 50 : 80}
+                            width={isMobile ? 40 : 60}
                             domain={[0, yAxisMax]}
                             tickFormatter={(value) => {
                                 if (value === 0) return '0';
