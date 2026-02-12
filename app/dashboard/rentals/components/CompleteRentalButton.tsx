@@ -1,7 +1,7 @@
 'use client';
 
 import { completeRental } from '@/app/actions';
-import { CheckCircle } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmModal } from '@/components/admin/ConfirmModal';
 
@@ -57,17 +57,17 @@ export default function CompleteRentalButton({ rentalId, compact = false, classN
             <button
                 onClick={handleComplete}
                 disabled={loading}
-                className={className || `w-full bg-[#ea6819] hover:bg-[#ea6819]/90 text-white ${compact ? 'p-1.5 text-[10px]' : 'p-3'} rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn shadow-[0_0_20px_-5px_rgba(234,104,25,0.5)] flex-1 disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={className || `w-full bg-[#ea6819] hover:bg-[#ea6819]/90 text-white ${compact ? 'p-1.5 text-[10px]' : 'p-3'} rounded-xl transition-all duration-300 flex items-center justify-center gap-3 group/btn shadow-[0_0_30px_-5px_rgba(234,104,25,0.4)] hover:shadow-[0_0_40px_-5px_rgba(234,104,25,0.6)] hover:scale-[1.02] active:scale-[0.98] flex-1 disabled:opacity-50 disabled:cursor-not-allowed`}
                 title="Complete Rental"
             >
                 {loading ? (
                     <div className={`${compact ? 'w-3 h-3' : 'w-5 h-5'} border-2 border-white/30 border-t-white rounded-full animate-spin`} />
                 ) : (
-                    <CheckCircle className={compact ? 'w-3 h-3' : 'w-5 h-5'} />
+                    <Check className={`${compact ? 'w-3 h-3' : 'w-5 h-5'} stroke-[3px]`} />
                 )}
                 {(!compact || !loading) && (
-                    <span className="font-bold uppercase tracking-widest">
-                        {compact ? 'Complete' : (loading ? 'Processing...' : 'Complete')}
+                    <span className="font-black uppercase tracking-[0.2em] text-[11px]">
+                        {compact ? 'Complete' : (loading ? 'Processing...' : 'Complete Rental')}
                     </span>
                 )}
             </button>

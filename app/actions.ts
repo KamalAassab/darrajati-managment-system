@@ -38,8 +38,11 @@ export async function getScooters(): Promise<Scooter[]> {
         price: Number(row.price || 0),
         quantity: Number(row.quantity || 1),
         activeRentals: Number(row.active_rentals || 0),
-        availableCount: Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0)),
-        status: (Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0)) === 0 ? 'rented' : 'available'),
+        maintenanceCount: Number(row.maintenance_count || 0),
+        availableCount: Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)),
+        status: (Number(row.maintenance_count || 0) > 0 && Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0)
+            ? 'maintenance'
+            : (Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0 ? 'rented' : 'available'),
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at?.toString() || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at?.toString() || ''),
     })) as Scooter[];
@@ -61,18 +64,22 @@ export async function searchScooters(searchTerm: string): Promise<Scooter[]> {
 
     return rows.map((row: any) => ({
         id: row.id.toString(),
-        slug: row.slug,
-        name: row.name,
-        image: row.image,
-        engine: row.engine,
-        speed: row.speed,
-        price: Number(row.price),
+        slug: row.slug || '',
+        name: row.name || '',
+        image: row.image || '',
+        engine: row.engine || '',
+        speed: row.speed || '',
+        price: Number(row.price || 0),
         quantity: Number(row.quantity || 1),
         activeRentals: Number(row.active_rentals || 0),
-        status: row.status,
-        createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at || ''),
-        updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at || ''),
-    }));
+        maintenanceCount: Number(row.maintenance_count || 0),
+        availableCount: Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)),
+        status: (Number(row.maintenance_count || 0) > 0 && Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0)
+            ? 'maintenance'
+            : (Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0 ? 'rented' : 'available'),
+        createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at?.toString() || ''),
+        updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at?.toString() || ''),
+    })) as Scooter[];
 }
 
 export async function getScooterById(id: string): Promise<Scooter | null> {
@@ -92,17 +99,21 @@ export async function getScooterById(id: string): Promise<Scooter | null> {
     const row = rows[0] as any;
     return {
         id: row.id.toString(),
-        slug: row.slug,
-        name: row.name,
-        image: row.image,
-        engine: row.engine,
-        speed: row.speed,
-        price: Number(row.price),
+        slug: row.slug || '',
+        name: row.name || '',
+        image: row.image || '',
+        engine: row.engine || '',
+        speed: row.speed || '',
+        price: Number(row.price || 0),
         quantity: Number(row.quantity || 1),
         activeRentals: Number(row.active_rentals || 0),
-        status: row.status,
-        createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at || ''),
-        updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at || ''),
+        maintenanceCount: Number(row.maintenance_count || 0),
+        availableCount: Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)),
+        status: (Number(row.maintenance_count || 0) > 0 && Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0)
+            ? 'maintenance'
+            : (Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0 ? 'rented' : 'available'),
+        createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at?.toString() || ''),
+        updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at?.toString() || ''),
     };
 }
 
@@ -160,7 +171,7 @@ export async function createScooter(prevState: any, formData: FormData): Promise
 
         await sql`
             INSERT INTO scooters (
-                slug, name, image, engine, speed, price, quantity, status
+                slug, name, image, engine, speed, price, quantity, maintenance_count, status
             ) VALUES (
                 ${slug},
                 ${validated.name},
@@ -169,6 +180,7 @@ export async function createScooter(prevState: any, formData: FormData): Promise
                 ${String(validated.speed)},
                 ${validated.price},
                 ${validated.quantity},
+                0,
                 'available'
             )
         `;
@@ -178,6 +190,22 @@ export async function createScooter(prevState: any, formData: FormData): Promise
         return { success: true, message: 'Scooter created successfully' };
     } catch (error) {
         console.error('CRITICAL ERROR in createScooter:', error);
+        return handleActionError(error);
+    }
+}
+
+export async function updateMaintenanceCountAction(id: string, count: number): Promise<ActionState> {
+    await requireAuth();
+
+    try {
+        await sql`
+            UPDATE scooters SET maintenance_count = ${count}, updated_at = CURRENT_TIMESTAMP WHERE id = ${id}
+        `;
+
+        revalidatePath('/dashboard/scooters');
+        revalidatePath('/dashboard');
+        return { success: true, message: 'Maintenance status updated' };
+    } catch (error) {
         return handleActionError(error);
     }
 }
@@ -230,6 +258,7 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
         const validated = scooterSchema.parse(data);
 
         // Build update query - conditionally include image if a new one was uploaded
+        // NOTE: We do NOT update maintenance_count here as it's handled separately
         if (imagePath) {
             await sql`
                 UPDATE scooters 

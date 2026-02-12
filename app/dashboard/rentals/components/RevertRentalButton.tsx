@@ -54,16 +54,16 @@ export default function RevertRentalButton({ rentalId }: { rentalId: string }) {
             <button
                 onClick={handleRevert}
                 disabled={loading}
-                className="w-full bg-white/5 hover:bg-white/10 text-white/60 hover:text-white p-2.5 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 group/btn border border-white/5 hover:border-white/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-white/5 hover:bg-white/10 text-white/50 hover:text-white p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group/btn border border-white/5 hover:border-white/20 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                 title="Revert Status"
             >
                 {loading ? (
-                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
-                    <RefreshCcw className="w-3.5 h-3.5" />
+                    <RefreshCcw className="w-4 h-4" />
                 )}
-                <span className="font-bold text-[10px] uppercase tracking-wider">
-                    {loading ? 'Reverting...' : 'Revert'}
+                <span className="font-black text-[11px] uppercase tracking-[0.2em]">
+                    {loading ? 'Reverting...' : 'Revert Rental'}
                 </span>
             </button>
             <ConfirmModal

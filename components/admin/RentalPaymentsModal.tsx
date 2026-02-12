@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Rental, RentalPayment } from '@/types/admin';
 import { addRentalPayment, getRentalPayments, deleteRentalPayment } from '@/app/actions';
 import { X, Plus, Trash2, DollarSign, Calendar, FileText, Loader2 } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 import { formatMAD } from '@/lib/utils/currency';
 
 
@@ -24,6 +25,20 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [notes, setNotes] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        type?: 'danger' | 'warning' | 'info' | 'success';
+        confirmText?: string;
+        cancelText?: string;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => { },
+    });
 
     useEffect(() => {
         if (isOpen && rental) {
@@ -53,8 +68,15 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
         if (!rental) return;
 
         setIsSubmitting(true);
+        const paymentAmount = Number(amount);
+        if (paymentAmount > remaining) {
+            alert(`Amount cannot exceed the remaining balance of ${formatMAD(remaining)}`);
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
-            const result = await addRentalPayment(rental.id, Number(amount), date, notes);
+            const result = await addRentalPayment(rental.id, paymentAmount, date, notes);
             if (result.success) {
                 // Refresh payments
                 await fetchPayments();
@@ -62,7 +84,15 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
                 setNotes('');
                 setShowAddForm(false);
             } else {
-                alert(result.message || 'Failed to add payment');
+                setConfirmModal({
+                    isOpen: true,
+                    title: 'Error',
+                    message: result.message || 'Failed to add payment',
+                    type: 'danger',
+                    onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+                    confirmText: 'OK',
+                    cancelText: ''
+                });
             }
         } catch (error) {
             console.error('Error adding payment:', error);
@@ -72,18 +102,36 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
     };
 
     const handleDeletePayment = async (paymentId: string) => {
-        if (!rental || !confirm('Are you sure you want to delete this payment?')) return;
+        if (!rental) return;
 
-        try {
-            const result = await deleteRentalPayment(paymentId, rental.id);
-            if (result.success) {
-                await fetchPayments();
-            } else {
-                alert(result.message || 'Failed to delete payment');
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Payment',
+            message: 'Are you sure you want to delete this payment record?',
+            type: 'danger',
+            confirmText: 'Delete',
+            onConfirm: async () => {
+                try {
+                    const result = await deleteRentalPayment(paymentId, rental.id);
+                    if (result.success) {
+                        await fetchPayments();
+                        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                    } else {
+                        setConfirmModal({
+                            isOpen: true,
+                            title: 'Error',
+                            message: result.message || 'Failed to delete payment',
+                            type: 'danger',
+                            onConfirm: () => setConfirmModal(prev => ({ ...prev, isOpen: false })),
+                            confirmText: 'OK',
+                            cancelText: ''
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error deleting payment:', error);
+                }
             }
-        } catch (error) {
-            console.error('Error deleting payment:', error);
-        }
+        });
     };
 
     if (!isOpen || !rental) return null;
@@ -192,7 +240,10 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
                 <div className="p-6 border-t border-white/10 bg-[#0a0a0a]">
                     {!showAddForm ? (
                         <button
-                            onClick={() => setShowAddForm(true)}
+                            onClick={() => {
+                                setShowAddForm(true);
+                                setAmount(remaining.toString());
+                            }}
                             className="w-full py-4 bg-white/5 hover:bg-white/10 border border-white/10 border-dashed rounded-xl text-white/60 hover:text-white transition-all flex items-center justify-center gap-2 font-bold uppercase tracking-wider text-sm"
                         >
                             <Plus className="w-5 h-5" />
@@ -207,15 +258,16 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-white/40 mb-1.5 block ml-1">Amount</label>
+                                    <label className="text-[10px] uppercase font-bold text-white/40 mb-1.5 block ml-1">Amount (Max: {formatMAD(remaining)})</label>
                                     <input
                                         type="number"
                                         required
                                         min="1"
+                                        max={remaining}
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
                                         className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
-                                        placeholder="0.00"
+                                        placeholder={remaining.toString()}
                                     />
                                 </div>
                                 <div>
@@ -253,6 +305,17 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
                     )}
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                type={confirmModal.type}
+                confirmText={confirmModal.confirmText}
+                cancelText={confirmModal.cancelText}
+            />
         </div>
     );
 }

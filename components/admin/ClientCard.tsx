@@ -32,8 +32,6 @@ export function ClientCard({ client, onEdit, onDelete }: ClientCardProps) {
                                     Inactive
                                 </span>
                             )}
-                            <span className="text-white/20 text-[10px] font-bold">•</span>
-                            <span className="text-white/40 text-xs font-bold tracking-wider">{client.phone}</span>
                         </div>
                     </div>
 
@@ -61,6 +59,14 @@ export function ClientCard({ client, onEdit, onDelete }: ClientCardProps) {
                     <div className="flex items-center gap-2">
                         <IdCard className="w-3.5 h-3.5 text-white/40" />
                         <span className="text-sm font-bold text-white/80">{client.documentId}</span>
+                    </div>
+                </div>
+
+                <div className="bg-white/[0.03] rounded-xl p-2.5 border border-white/[0.03] hover:border-white/10 transition-colors">
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Phone</p>
+                    <div className="flex items-center gap-2">
+                        <Phone className="w-3.5 h-3.5 text-white/40" />
+                        <span className="text-sm font-bold text-white/80 truncate" title={client.phone}>{client.phone}</span>
                     </div>
                 </div>
 

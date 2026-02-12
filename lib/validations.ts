@@ -13,6 +13,7 @@ export const scooterSchema = z.object({
     speed: z.coerce.number().int().positive('Speed must be a positive integer (KM/H)'),
     price: z.coerce.number().int().positive('Price must be a positive integer'),
     quantity: z.coerce.number().int().min(1, 'Quantity must be at least 1'),
+    maintenanceCount: z.coerce.number().int().min(0).default(0).optional(),
     // status: z.enum(['available', 'rented', 'maintenance']), // Removed legacy status
 });
 

@@ -2,7 +2,7 @@
 
 import { RentalWithDetails } from '@/types/admin';
 import { formatMAD, formatDate, formatDateShort, isOverdue } from '@/lib/utils/currency';
-import { Calendar, User, Bike, DollarSign, CheckCircle, AlertCircle, Clock, Trash2, Edit2, CreditCard } from 'lucide-react';
+import { Bike, CreditCard, ArrowUpRight } from 'lucide-react';
 import DeleteRentalButton from '@/app/dashboard/rentals/components/DeleteRentalButton';
 import CompleteRentalButton from '@/app/dashboard/rentals/components/CompleteRentalButton';
 import RevertRentalButton from '@/app/dashboard/rentals/components/RevertRentalButton';
@@ -14,104 +14,137 @@ interface RentalCardProps {
 
 export function RentalCard({ rental, onPayment }: RentalCardProps) {
     const overdue = isOverdue(rental.endDate) && rental.status === 'active';
-    const remaining = rental.totalPrice - rental.amountPaid;
-    const isPaid = remaining <= 0;
+    const totalPaid = rental.amountPaid || 0;
+    const totalPrice = rental.totalPrice || 0;
+    const remaining = Math.max(0, totalPrice - totalPaid);
+
+    // Payment Status logic
+    const isFullyPaid = totalPaid >= totalPrice;
+    const isPartial = totalPaid > 0 && totalPaid < totalPrice;
+    const isUnpaid = totalPaid === 0;
+
+    const paymentPercentage = totalPrice > 0 ? Math.min(100, (totalPaid / totalPrice) * 100) : 0;
 
     return (
-        <div className={`group/rental relative bg-[#0a0a0a] border rounded-2xl overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col ${overdue
-            ? 'border-red-500/50 shadow-[0_0_30px_-10px_rgba(239,68,68,0.3)] hover:shadow-[0_0_50px_-10px_rgba(239,68,68,0.4)]'
-            : 'border-white/10 hover:border-primary/50 hover:shadow-primary/5'
+        <div className={`group/rental relative bg-[#0a0a0a] border rounded-[2rem] overflow-hidden transition-all duration-500 hover:shadow-2xl flex flex-col ${overdue
+            ? 'border-red-500/50 shadow-[0_0_40px_-10px_rgba(239,68,68,0.3)] hover:border-red-500'
+            : 'border-white/10 hover:border-primary/50 hover:shadow-[0_0_40px_-20px_rgba(234,104,25,0.3)]'
             }`}>
-            {/* Overdue Alert Strip */}
-            {overdue && (
-                <div className="absolute top-0 left-0 w-full h-1 bg-red-500 animate-pulse z-20" />
-            )}
+            {/* Top Status Indicators */}
+            <div className="px-5 pt-5 flex items-center justify-between gap-2 z-10">
+                <div className="flex items-center gap-2">
+                    <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${rental.status === 'active'
+                        ? overdue
+                            ? 'bg-red-500/10 border-red-500/20 text-red-500'
+                            : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
+                        : 'bg-green-500/10 border-green-500/20 text-green-400'
+                        }`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${rental.status === 'active'
+                            ? overdue ? 'bg-red-500 animate-pulse' : 'bg-blue-400'
+                            : 'bg-green-400'
+                            }`} />
+                        {overdue ? 'Overdue' : rental.status === 'active' ? 'Active' : 'Completed'}
+                    </span>
 
-            {/* Header */}
-            <div className={`p-5 pb-0 flex justify-between items-start relative z-10 ${overdue ? 'bg-gradient-to-b from-red-500/10 to-transparent' : ''}`}>
-                <div>
-                    <h3 className="text-lg font-black font-outfit text-white uppercase tracking-tight truncate max-w-[180px] group-hover/rental:text-primary transition-colors">
-                        {rental.client.fullName}
-                    </h3>
-                    <div className="flex items-center gap-1.5 mt-1">
-                        <span className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${rental.status === 'active'
-                            ? overdue
-                                ? 'bg-red-500/10 border-red-500/20 text-red-500'
-                                : 'bg-blue-500/10 border-blue-500/20 text-blue-400'
-                            : 'bg-green-500/10 border-green-500/20 text-green-400'
-                            }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${rental.status === 'active'
-                                ? overdue ? 'bg-red-500 animate-ping' : 'bg-blue-400 animate-pulse'
-                                : 'bg-green-400'
-                                }`} />
-                            {overdue ? 'Overdue!' : rental.status === 'active' ? 'Active' : 'Completed'}
-                        </span>
-                    </div>
+                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${isFullyPaid
+                        ? 'bg-green-500/10 border-green-500/20 text-green-400'
+                        : 'bg-red-500/10 border-red-500/20 text-red-500'
+                        }`}>
+                        {isFullyPaid ? 'Paid' : isPartial ? 'Partial' : 'Unpaid'}
+                    </span>
                 </div>
-                <div className="text-right">
-                    <p className="font-price text-lg text-white leading-none">{formatMAD(rental.totalPrice)}</p>
-                    <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 ${isPaid ? 'text-green-500' : 'text-red-500'}`}>
-                        {isPaid ? 'Fully Paid' : 'Unpaid'}
-                    </p>
+
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => onPayment(rental)}
+                        className={`p-3 rounded-xl transition-all border flex items-center justify-center hover:scale-105 active:scale-95 ${isFullyPaid
+                            ? 'bg-white/5 text-white/10 border-white/5 cursor-not-allowed'
+                            : 'bg-primary/10 text-primary border-primary/20 hover:bg-primary/20'
+                            }`}
+                        disabled={isFullyPaid}
+                        title="Add Payment"
+                    >
+                        <CreditCard className="w-4 h-4" />
+                    </button>
+                    <DeleteRentalButton rentalId={rental.id} />
                 </div>
             </div>
 
-            {/* Content */}
-            <div className="p-5 flex-1 flex flex-col gap-3">
-                {/* Scooter & Dates Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div className="sm:col-span-2 bg-white/[0.03] rounded-xl p-3 border border-white/[0.03] flex items-center gap-3 group/scooter">
-                        <Bike className="w-5 h-5 text-primary group-hover/scooter:scale-110 transition-transform" />
-                        <p className="text-sm font-bold text-white tracking-wide">{rental.scooter.name}</p>
-                    </div>
-
-                    <div className={`sm:col-span-2 bg-white/[0.03] rounded-xl p-3 border ${overdue ? 'border-red-500/30 bg-red-500/5' : 'border-white/[0.03]'}`}>
-                        <div className={`flex items-center gap-3 ${overdue ? 'text-red-400' : 'text-white/80'}`}>
-                            <Calendar className="w-5 h-5 text-primary" />
-                            <span className="text-xs font-black tracking-tight">
-                                {formatDateShort(rental.startDate)}
-                                <span className="mx-2 text-white/20">→</span>
-                                {formatDateShort(rental.endDate)}
-                            </span>
-                        </div>
-                    </div>
-
-                    {rental.hasGuarantee && (
-                        <div className="sm:col-span-2 bg-green-500/10 rounded-xl p-3 border border-green-500/20 flex items-center gap-3">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <p className="text-xs font-bold text-green-500 uppercase tracking-wider">
-                                Guarantee: 1000 MAD
-                            </p>
-                        </div>
-                    )}
+            {/* Client & Info */}
+            <div className="p-5 space-y-4 flex-1">
+                <div>
+                    <h3 className="text-2xl font-black font-outfit text-white uppercase tracking-tighter leading-tight truncate group-hover/rental:text-primary transition-colors">
+                        {rental.client.fullName}
+                    </h3>
                 </div>
 
-                {/* Actions */}
-                <div className="mt-auto pt-2 grid grid-cols-2 gap-2 opacity-100 sm:opacity-0 sm:translate-y-2 group-hover/rental:opacity-100 group-hover/rental:translate-y-0 transition-all duration-300">
-                    {rental.status === 'active' ? (
-                        <div className="col-span-2">
-                            <CompleteRentalButton rentalId={rental.id} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+                    {/* Scooter Info Card */}
+                    <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-3 flex items-center justify-between group/scooter transition-colors hover:bg-white/[0.05]">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center shrink-0">
+                                <Bike className="w-5 h-5 text-primary" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-sm font-bold text-white tracking-wide truncate">{rental.scooter.name}</p>
+                            </div>
                         </div>
-                    ) : (
-                        <div className="col-span-2">
-                            <RevertRentalButton rentalId={rental.id} />
+                    </div>
+
+                    {/* Dates Card */}
+                    <div className="flex items-center justify-center gap-3 p-3 bg-white/[0.03] border border-white/5 rounded-2xl group/dates hover:bg-white/[0.05] transition-colors">
+                        <div className="text-center">
+                            <p className="text-sm font-black text-white tracking-tight">{formatDateShort(rental.startDate)}</p>
                         </div>
-                    )}
+                        <div className="h-px w-4 bg-white/10" />
+                        <div className="text-center">
+                            <p className={`text-sm font-black tracking-tight ${overdue ? 'text-red-500' : 'text-white'}`}>
+                                {formatDateShort(rental.endDate)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-                    <button
-                        onClick={() => onPayment(rental)}
-                        disabled={isPaid}
-                        className="py-2.5 rounded-lg bg-white/5 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed text-white/60 hover:text-white font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-2 transition-colors border border-white/5"
-                    >
-                        <CreditCard className="w-3.5 h-3.5" />
-                        Pay
-                    </button>
+                {/* Payment Progress */}
+                <div className="space-y-2">
+                    <div className="flex justify-between items-end">
+                        <span className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Payment Progress</span>
+                        <div className="text-right">
+                            <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Remaining: </span>
+                            <span className="text-xs font-price text-[#ea6819] font-bold">{formatMAD(remaining)}</span>
+                        </div>
+                    </div>
+                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden p-[1px] border border-white/10">
+                        <div
+                            className={`h-full rounded-full transition-all duration-1000 ease-out ${isFullyPaid
+                                ? 'bg-green-500/80 shadow-[0_0_10px_rgba(34,197,94,0.4)]'
+                                : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]'
+                                }`}
+                            style={{ width: `${paymentPercentage}%` }}
+                        />
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] font-black tracking-tighter">
+                        <span className="text-white/60">{formatMAD(totalPaid)}</span>
+                        <span className="text-white/20">OF</span>
+                        <span className="text-white/60">{formatMAD(totalPrice)}</span>
+                    </div>
+                </div>
 
-                    <div className="w-full">
-                        <DeleteRentalButton rentalId={rental.id} />
+                {/* Bottom Action */}
+                <div className="pt-2">
+                    <div className="flex items-center gap-2">
+                        <div className="flex-1">
+                            {rental.status === 'active' ? (
+                                <CompleteRentalButton rentalId={rental.id} />
+                            ) : (
+                                <RevertRentalButton rentalId={rental.id} />
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+
+
