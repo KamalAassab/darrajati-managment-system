@@ -64,7 +64,7 @@ export function CustomSelect({
                 type="button"
                 onClick={() => !disabled && setIsOpen(!isOpen)}
                 disabled={disabled}
-                className={`w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium transition-all outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed ${isOpen ? 'ring-2 ring-primary/30 border-primary/50' : 'hover:bg-white/10'}`}
+                className={`w-full flex items-center justify-between px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-medium transition-all outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed ${isOpen ? 'ring-2 ring-primary/30 border-primary/50' : 'hover:bg-white/10'}`}
             >
                 <span className={`flex items-center gap-2 ${!selectedOption ? 'text-white/30' : ''}`}>
                     {selectedOption ? (
@@ -80,7 +80,7 @@ export function CustomSelect({
             </button>
 
             {/* Dropdown Menu */}
-            <div className={`absolute top-full left-0 w-full mt-2 bg-[#0a0a0a] border border-white/10 rounded-xl overflow-hidden shadow-2xl transition-all duration-200 z-50 origin-top ${isOpen ? 'opacity-100 translate-y-0 scale-100 visible' : 'opacity-0 -translate-y-2 scale-95 invisible'}`}>
+            <div className={`absolute top-full left-0 w-full mt-2 bg-[#0a0a0a] border border-white/10 rounded-2xl overflow-hidden shadow-2xl transition-all duration-200 z-50 origin-top ${isOpen ? 'opacity-100 translate-y-0 scale-100 visible' : 'opacity-0 -translate-y-2 scale-95 invisible'}`}>
                 <div className="p-1.5 flex flex-col gap-0.5 max-h-[240px] overflow-y-auto">
                     {options.map((option) => (
                         <button

@@ -15,6 +15,7 @@ export function formatDate(date: string): string {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
+        timeZone: 'UTC', // Fix hydration mismatch
     });
 }
 
@@ -23,6 +24,7 @@ export function formatDateShort(date: string): string {
         day: '2-digit',
         month: '2-digit',
         year: '2-digit',
+        timeZone: 'UTC', // Fix hydration mismatch
     });
 }
 

@@ -1,8 +1,9 @@
-'use client';
-
-
+import { useState, useTransition, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { formatMAD } from '@/lib/utils/currency';
+import { getAnalyticsData } from '@/app/actions';
+import { AnalyticsData } from '@/types/admin';
+import { Filter, Calendar, ChevronDown } from 'lucide-react';
 
 // Custom Tooltip Component
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -12,7 +13,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         const profit = payload.find((p: any) => p.dataKey === 'profit')?.value || 0;
 
         return (
-            <div className="bg-black/95 border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-sm">
+            <div className="bg-black/95 border border-white/10 rounded-2xl p-4 shadow-2xl backdrop-blur-sm z-50">
                 <div className="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-3">{label}</div>
                 <div className="space-y-2">
                     <div className="flex items-center justify-between gap-6">
@@ -45,46 +46,172 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export default function AnalyticsChart({ data }: { data: any[] }) {
-    if (!data || data.length === 0) return (
-        <div className="h-[300px] flex items-center justify-center text-white/20 uppercase tracking-widest text-xs">
-            No Data
+const MonthYearDropdown = ({ prop, value, options, onChange }: { prop: string, value: number, options: { value: number, label: string }[], onChange: (val: number) => void }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div className="relative">
+            {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`flex items-center gap-2 appearance-none bg-black/60 border border-[#ea6819]/30 text-white text-[10px] uppercase font-bold tracking-wider rounded-lg pl-3 pr-2 py-2 focus:outline-none focus:border-[#ea6819] transition-all hover:bg-black/80 hover:border-[#ea6819]/60 shadow-[0_0_10px_rgba(234,104,25,0.1)] ${isOpen ? 'ring-1 ring-[#ea6819] border-[#ea6819]' : ''}`}
+            >
+                <span className="min-w-[60px] text-left">{options.find(o => o.value === value)?.label}</span>
+                <ChevronDown className={`w-3 h-3 text-[#ea6819] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute top-full left-0 mt-1 w-full min-w-[120px] bg-[#0a0a0a] border border-[#ea6819]/30 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.5)] z-50 overflow-hidden backdrop-blur-xl">
+                    <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-[#ea6819]/50 scrollbar-track-transparent p-1">
+                        {options.map((option) => (
+                            <button
+                                key={option.value}
+                                onClick={() => {
+                                    onChange(option.value);
+                                    setIsOpen(false);
+                                }}
+                                className={`w-full text-left px-3 py-2 text-[10px] uppercase font-bold tracking-wider rounded-md transition-colors ${value === option.value
+                                        ? 'bg-[#ea6819] text-white shadow-lg'
+                                        : 'text-white/70 hover:bg-[#ea6819]/10 hover:text-[#ea6819]'
+                                    }`}
+                            >
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            )}
         </div>
     );
+};
 
-    // Add profit calculation to data if not present
-    const chartData = data.map(item => ({
-        ...item,
-        profit: (item.revenue || 0) - (item.expenses || 0)
-    }));
+export default function AnalyticsChart({ data: initialData }: { data: any[] }) {
+    const [chartData, setChartData] = useState<any[]>([]);
+    const [isPending, startTransition] = useTransition();
+    const [filterMode, setFilterMode] = useState<'all' | 'month'>('all');
+    const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+
+    // Initialize with props data
+    useEffect(() => {
+        if (initialData) {
+            processData(initialData);
+        }
+    }, [initialData]);
+
+    const processData = (rawData: any[]) => {
+        const processed = rawData.map(item => ({
+            ...item,
+            profit: (item.revenue || 0) - (item.expenses || 0)
+        }));
+        setChartData(processed);
+    };
+
+    const handleFilterChange = (mode: 'all' | 'month', month?: number, year?: number) => {
+        startTransition(async () => {
+            try {
+                let result: AnalyticsData;
+                if (mode === 'all') {
+                    result = await getAnalyticsData();
+                } else {
+                    result = await getAnalyticsData({
+                        month: month || selectedMonth,
+                        year: year || selectedYear
+                    });
+                }
+                processData(result.monthlyStats);
+            } catch (error) {
+                console.error("Failed to fetch analytics data:", error);
+            }
+        });
+    };
 
     // Calculate max value for Y-axis domain
     const maxValue = Math.max(
-        ...chartData.map(d => Math.max(d.revenue || 0, d.expenses || 0, Math.abs(d.profit || 0)))
+        ...chartData.map(d => Math.max(d.revenue || 0, d.expenses || 0, Math.abs(d.profit || 0))),
+        1000 // Prevent 0 domain if empty
     );
-    const yAxisMax = Math.ceil(maxValue / 1000) * 1000 + 1000; // Round up to nearest 1000 + buffer
+    const yAxisMax = Math.ceil(maxValue / 1000) * 1000 + 1000;
+
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    const years = [2026, 2027, 2028, 2029, 2030];
 
     return (
-        <div className="glass-panel rounded-3xl p-4 md:p-6 border-white/[0.03] hover:border-white/[0.08] transition-all duration-500">
-            <div className="flex flex-col xl:flex-row justify-between xl:items-center gap-6 mb-8">
-                <div>
-                    <h3 className="text-2xl text-white uppercase font-bold mb-1">Financial Analysis</h3>
+        <div className="glass-panel rounded-3xl p-6 border-white/[0.03] relative overflow-hidden group">
+            {/* Background Glow Effect */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+
+            <div className="flex flex-col xl:flex-row justify-between xl:items-center gap-6 mb-8 relative z-10">
+                <div className="flex flex-col gap-2">
+                    <h3 className="text-2xl text-white uppercase font-bold flex items-center gap-3">
+                        Financial Analysis
+                        {isPending && <span className="text-xs text-white/30 animate-pulse font-normal">Updating...</span>}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                        {/* Filter Mode Toggle */}
+                        <div className="flex bg-black/40 p-1 rounded-lg border border-white/5">
+                            <button
+                                onClick={() => {
+                                    setFilterMode('all');
+                                    handleFilterChange('all');
+                                }}
+                                className={`px-3 py-1.5 rounded-md text-[10px] uppercase font-bold tracking-widest transition-all ${filterMode === 'all'
+                                    ? 'bg-primary text-white shadow-lg'
+                                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                All History
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setFilterMode('month');
+                                    const currentMonth = new Date().getMonth() + 1;
+                                    const currentYear = new Date().getFullYear();
+                                    handleFilterChange('month', currentMonth, currentYear);
+                                    setSelectedMonth(currentMonth);
+                                    setSelectedYear(currentYear);
+                                }}
+                                className={`px-3 py-1.5 rounded-md text-[10px] uppercase font-bold tracking-widest transition-all ${filterMode === 'month'
+                                    ? 'bg-primary text-white shadow-lg'
+                                    : 'text-white/40 hover:text-white hover:bg-white/5'
+                                    }`}
+                            >
+                                Monthly
+                            </button>
+                        </div>
+
+                        {/* Custom Month/Year Selectors */}
+                        {filterMode === 'month' && (
+                            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                                <MonthYearDropdown prop="month" value={selectedMonth} options={months.map((m, i) => ({ value: i + 1, label: m }))} onChange={(m) => {
+                                    setSelectedMonth(m);
+                                    handleFilterChange('month', m, selectedYear);
+                                }} />
+                                <MonthYearDropdown prop="year" value={selectedYear} options={years.map(y => ({ value: y, label: y.toString() }))} onChange={(y) => {
+                                    setSelectedYear(y);
+                                    handleFilterChange('month', selectedMonth, y);
+                                }} />
+                            </div>
+                        )}
+                    </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
-                    <div className="flex gap-4">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-blue-500" />
-                            <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Revenue</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-red-500" />
-                            <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Expenses</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-green-500" />
-                            <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Profit</span>
-                        </div>
+                <div className="flex gap-6">
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" />
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Revenue</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]" />
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Expenses</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                        <span className="text-[10px] uppercase font-bold tracking-widest text-white/40">Profit</span>
                     </div>
                 </div>
             </div>
@@ -106,31 +233,28 @@ export default function AnalyticsChart({ data }: { data: any[] }) {
                                 <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                         <XAxis
                             dataKey="month"
                             stroke="rgba(255,255,255,0.1)"
-                            tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11, fontFamily: 'var(--font-outfit)', fontWeight: 700 }}
-                            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-                            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
+                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontFamily: 'var(--font-outfit)', fontWeight: 500 }}
+                            tickLine={false}
+                            axisLine={false}
                             dy={10}
-                            interval={0}
-                            angle={-45}
-                            textAnchor="end"
-                            height={60}
+                            interval="preserveStartEnd"
+                            minTickGap={30}
                         />
                         <YAxis
                             stroke="rgba(255,255,255,0.1)"
-                            tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 10, fontFamily: 'var(--font-outfit)', fontWeight: 700 }}
-                            tickLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-                            axisLine={{ stroke: 'rgba(255,255,255,0.1)' }}
-                            width={85}
-                            domain={[0, yAxisMax]}
-                            tickFormatter={(value) => value === 0 ? '0' : `${value.toLocaleString()} MAD`}
-                            tickCount={6}
+                            tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10, fontFamily: 'var(--font-outfit)', fontWeight: 500 }}
+                            tickLine={false}
+                            axisLine={false}
+                            width={100}
+                            domain={[0, 20000]}
+                            ticks={[0, 2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000]}
+                            tickFormatter={(value) => value === 0 ? '0 MAD' : `${value} MAD`}
                         />
-                        <ReferenceLine y={0} stroke="rgba(255,255,255,0.2)" strokeDasharray="3 3" />
-                        <Tooltip content={<CustomTooltip />} />
+                        <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1, strokeDasharray: '4 4' }} />
                         <Area
                             type="monotone"
                             dataKey="revenue"
@@ -138,9 +262,7 @@ export default function AnalyticsChart({ data }: { data: any[] }) {
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorRevenue)"
-                            animationDuration={1500}
-                            dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4, stroke: '#0a0a0a' }}
-                            activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2, fill: '#0a0a0a' }}
+                            animationDuration={1000}
                         />
                         <Area
                             type="monotone"
@@ -149,9 +271,7 @@ export default function AnalyticsChart({ data }: { data: any[] }) {
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorExpenses)"
-                            animationDuration={1500}
-                            dot={{ fill: '#EF4444', strokeWidth: 2, r: 4, stroke: '#0a0a0a' }}
-                            activeDot={{ r: 6, stroke: '#EF4444', strokeWidth: 2, fill: '#0a0a0a' }}
+                            animationDuration={1000}
                         />
                         <Area
                             type="monotone"
@@ -160,9 +280,7 @@ export default function AnalyticsChart({ data }: { data: any[] }) {
                             strokeWidth={3}
                             fillOpacity={1}
                             fill="url(#colorProfit)"
-                            animationDuration={1500}
-                            dot={{ fill: '#10B981', strokeWidth: 2, r: 4, stroke: '#0a0a0a' }}
-                            activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2, fill: '#0a0a0a' }}
+                            animationDuration={1000}
                         />
                     </AreaChart>
                 </ResponsiveContainer>

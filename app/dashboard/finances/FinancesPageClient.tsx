@@ -161,13 +161,13 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
             <div className="flex justify-between items-end">
                 <div>
                     <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton">
-                        <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                        <DollarSign className="w-6 h-6 md:w-8 md:h-8 text-[#ea6819]" />
                         Finances
                     </h1>
                 </div>
                 <button
                     onClick={() => showForm ? setShowForm(false) : handleOpenCreate()}
-                    className="bg-primary text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-primary/20"
+                    className="bg-[#ea6819] text-white w-12 h-12 md:w-auto md:h-auto md:px-6 md:py-3 rounded-full md:rounded-2xl flex items-center justify-center gap-2 hover:bg-[#ea6819]/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-[#ea6819]/20"
                 >
                     <Plus className={`w-6 h-6 md:w-5 md:h-5 transition-transform duration-300 ${showForm ? 'rotate-45' : ''}`} />
                     <span className="hidden md:inline">{showForm ? 'Cancel' : 'Add Expense'}</span>
@@ -273,7 +273,7 @@ export default function FinancesPageClient({ expenses, dashboardStats }: Finance
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="flex-1 bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-all duration-300 primary-glow uppercase tracking-wide disabled:opacity-50 disabled:cursor-wait"
+                                className="flex-1 bg-[#ea6819] text-white font-bold py-4 rounded-xl hover:bg-[#ea6819]/90 transition-all duration-300 primary-glow uppercase tracking-wide disabled:opacity-50 disabled:cursor-wait"
                             >
                                 {isSubmitting ? 'Saving...' : (editingId ? 'Update Expense' : 'Save Expense')}
                             </button>

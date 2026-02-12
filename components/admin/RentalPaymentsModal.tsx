@@ -199,44 +199,44 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
                             Add New Payment
                         </button>
                     ) : (
-                        <form onSubmit={handleAddPayment} className="space-y-4 bg-white/5 p-4 rounded-xl border border-white/10 animate-in slide-in-from-bottom-4">
+                        <form onSubmit={handleAddPayment} className="space-y-4 bg-white/5 p-6 rounded-3xl border border-white/10 animate-in slide-in-from-bottom-4">
                             <div className="flex justify-between items-center mb-2">
-                                <h3 className="text-sm font-bold text-white">New Payment</h3>
+                                <h3 className="text-sm font-bold text-white uppercase tracking-wider">New Payment</h3>
                                 <button type="button" onClick={() => setShowAddForm(false)} className="text-xs text-white/50 hover:text-white">Cancel</button>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-white/40 mb-1 block">Amount</label>
+                                    <label className="text-[10px] uppercase font-bold text-white/40 mb-1.5 block ml-1">Amount</label>
                                     <input
                                         type="number"
                                         required
                                         min="1"
                                         value={amount}
                                         onChange={(e) => setAmount(e.target.value)}
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-green-500"
+                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                         placeholder="0.00"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] uppercase font-bold text-white/40 mb-1 block">Date</label>
+                                    <label className="text-[10px] uppercase font-bold text-white/40 mb-1.5 block ml-1">Date</label>
                                     <input
                                         type="date"
                                         required
                                         value={date}
                                         onChange={(e) => setDate(e.target.value)}
-                                        className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-green-500"
+                                        className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-[10px] uppercase font-bold text-white/40 mb-1 block">Notes (Optional)</label>
+                                <label className="text-[10px] uppercase font-bold text-white/40 mb-1.5 block ml-1">Notes (Optional)</label>
                                 <input
                                     type="text"
                                     value={notes}
                                     onChange={(e) => setNotes(e.target.value)}
-                                    className="w-full bg-black/50 border border-white/10 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-green-500"
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
                                     placeholder="Weekly payment..."
                                 />
                             </div>
@@ -244,7 +244,7 @@ export function RentalPaymentsModal({ isOpen, onClose, rental }: RentalPaymentsM
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full py-3 bg-green-600 hover:bg-green-500 text-black font-bold rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                                className="w-full py-4 bg-green-600 hover:bg-green-500 text-black font-bold rounded-2xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 uppercase tracking-wide text-sm"
                             >
                                 {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <DollarSign className="w-4 h-4" />}
                                 Confirm Payment

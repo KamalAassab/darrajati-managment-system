@@ -38,11 +38,8 @@ export async function getScooters(): Promise<Scooter[]> {
         price: Number(row.price || 0),
         quantity: Number(row.quantity || 1),
         activeRentals: Number(row.active_rentals || 0),
-        maintenanceCount: Number(row.maintenance_count || 0),
-        availableCount: Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)),
-        status: (Number(row.maintenance_count || 0) > 0 && Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0)
-            ? 'maintenance'
-            : (Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0) - Number(row.maintenance_count || 0)) === 0 ? 'rented' : 'available'),
+        availableCount: Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0)),
+        status: (Math.max(0, Number(row.quantity || 1) - Number(row.active_rentals || 0)) === 0 ? 'rented' : 'available'),
         createdAt: row.created_at instanceof Date ? row.created_at.toISOString() : (row.created_at?.toString() || ''),
         updatedAt: row.updated_at instanceof Date ? row.updated_at.toISOString() : (row.updated_at?.toString() || ''),
     })) as Scooter[];
@@ -157,14 +154,13 @@ export async function createScooter(prevState: any, formData: FormData): Promise
             speed: formData.get('speed'),
             price: formData.get('price'),
             quantity: formData.get('quantity') || 1,
-            maintenanceCount: formData.get('maintenanceCount') || 0,
         };
 
         const validated = scooterSchema.parse(data);
 
         await sql`
             INSERT INTO scooters (
-                slug, name, image, engine, speed, price, quantity, maintenance_count, status
+                slug, name, image, engine, speed, price, quantity, status
             ) VALUES (
                 ${slug},
                 ${validated.name},
@@ -173,34 +169,15 @@ export async function createScooter(prevState: any, formData: FormData): Promise
                 ${String(validated.speed)},
                 ${validated.price},
                 ${validated.quantity},
-                ${validated.maintenanceCount},
                 'available'
             )
         `;
 
         revalidatePath('/dashboard/scooters');
-        revalidatePath('/dashboard/rentals/new');
         revalidatePath('/dashboard');
         return { success: true, message: 'Scooter created successfully' };
     } catch (error) {
         console.error('CRITICAL ERROR in createScooter:', error);
-        return handleActionError(error);
-    }
-}
-
-export async function updateMaintenanceCountAction(id: string, count: number): Promise<ActionState> {
-    await requireAuth();
-
-    try {
-        await sql`
-            UPDATE scooters SET maintenance_count = ${count}, updated_at = CURRENT_TIMESTAMP WHERE id = ${id}
-        `;
-
-        revalidatePath('/dashboard/scooters');
-        revalidatePath('/dashboard/rentals/new');
-        revalidatePath('/dashboard');
-        return { success: true, message: 'Maintenance status updated' };
-    } catch (error) {
         return handleActionError(error);
     }
 }
@@ -248,7 +225,6 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
             speed: formData.get('speed'),
             price: formData.get('price'),
             quantity: formData.get('quantity') || 1,
-            maintenanceCount: formData.get('maintenanceCount') || 0,
         };
 
         const validated = scooterSchema.parse(data);
@@ -264,7 +240,6 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
                     speed = ${String(validated.speed)}, 
                     price = ${validated.price}, 
                     quantity = ${validated.quantity},
-                    maintenance_count = ${validated.maintenanceCount}, 
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ${id}
             `;
@@ -277,14 +252,12 @@ export async function updateScooter(id: string, formData: FormData): Promise<Act
                     speed = ${String(validated.speed)}, 
                     price = ${validated.price}, 
                     quantity = ${validated.quantity},
-                    maintenance_count = ${validated.maintenanceCount}, 
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ${id}
             `;
         }
 
         revalidatePath('/dashboard/scooters');
-        revalidatePath('/dashboard/rentals/new');
         revalidatePath('/dashboard');
         return { success: true, message: 'Scooter updated successfully' };
     } catch (error) {
@@ -338,7 +311,6 @@ export async function deleteScooter(id: string): Promise<ActionState> {
         }
 
         revalidatePath('/dashboard/scooters');
-        revalidatePath('/dashboard/rentals/new');
         revalidatePath('/dashboard');
         return { success: true, message: 'Scooter deleted successfully' };
     } catch (error) {
@@ -672,7 +644,7 @@ export async function createRental(prevState: any, formData: FormData): Promise<
 
         // Security Check: Verify Scooter Availability
         const scooterCheck = await sql`
-            SELECT status, price, quantity, maintenance_count FROM scooters WHERE id = ${validatedRental.scooterId}
+            SELECT status, price, quantity FROM scooters WHERE id = ${validatedRental.scooterId}
         `;
 
         if (scooterCheck.length === 0) {
@@ -689,7 +661,7 @@ export async function createRental(prevState: any, formData: FormData): Promise<
         `;
         const activeCount = Number(activeRentals[0]?.count || 0);
 
-        if (quantity - activeCount - (scooter.maintenance_count || 0) <= 0) {
+        if (quantity - activeCount <= 0) {
             return { success: false, message: 'No scooters available (checked maintenance and active rentals).' };
         }
 
@@ -1070,40 +1042,66 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
 // ==================== ANALYTICS ACTIONS ====================
 
-export async function getAnalyticsData(): Promise<AnalyticsData> {
+export async function getAnalyticsData(filter?: { month?: number; year?: number }): Promise<AnalyticsData> {
     await requireAuth();
 
-    // 1. Monthly Revenue & Expenses (Last 6 Months) - with mid-month points
-    const monthlyStats = await sql`
-        WITH date_points AS (
-            SELECT (sm + (off || ' days')::interval)::date as d
-            FROM generate_series('2026-01-01'::date, date_trunc('month', CURRENT_DATE), '1 month'::interval) sm
-            CROSS JOIN (VALUES (0), (14)) AS offsets(off)
-            WHERE (sm + (off || ' days')::interval) <= CURRENT_DATE
-        )
-        SELECT 
-            CASE 
-                WHEN EXTRACT(DAY FROM d) = 1 THEN TO_CHAR(d, 'Mon')
-                ELSE TO_CHAR(d, 'Mon') || ' 15'
-            END as month_label,
-            d as raw_date,
-            (SELECT COALESCE(SUM(total_price), 0) FROM rentals 
-             WHERE created_at >= d AND created_at < (
-                 CASE 
-                    WHEN EXTRACT(DAY FROM d) = 1 THEN d + INTERVAL '14 days'
-                    ELSE date_trunc('month', d) + INTERVAL '1 month'
-                 END
-             )) as revenue,
-            (SELECT COALESCE(SUM(amount), 0) FROM expenses 
-             WHERE date >= d AND date < (
-                 CASE 
-                    WHEN EXTRACT(DAY FROM d) = 1 THEN d + INTERVAL '14 days'
-                    ELSE date_trunc('month', d) + INTERVAL '1 month'
-                 END
-             )) as expenses
-        FROM date_points
-        ORDER BY raw_date ASC
-    `;
+    let monthlyStats;
+
+    if (filter?.month && filter?.year) {
+        // Specific Month View - Daily Data Points
+        const startDate = `${filter.year}-${String(filter.month).padStart(2, '0')}-01`;
+        const nextMonth = filter.month === 12
+            ? `${filter.year + 1}-01-01`
+            : `${filter.year}-${String(filter.month + 1).padStart(2, '0')}-01`;
+
+        monthlyStats = await sql`
+            WITH date_points AS (
+                SELECT d::date
+                FROM generate_series(${startDate}::date, (${nextMonth}::date - INTERVAL '1 day'), '1 day'::interval) d
+            )
+            SELECT 
+                TO_CHAR(d, 'DD Mon') as month_label,
+                d as raw_date,
+                (SELECT COALESCE(SUM(total_price), 0) FROM rentals 
+                 WHERE created_at >= d AND created_at < (d + INTERVAL '1 day')) as revenue,
+                (SELECT COALESCE(SUM(amount), 0) FROM expenses 
+                 WHERE date >= d AND date < (d + INTERVAL '1 day')) as expenses
+            FROM date_points
+            ORDER BY raw_date ASC
+        `;
+    } else {
+        // All History View (Default) - Bi-monthly Data Points (1st and 15th) from Jan 2026
+        monthlyStats = await sql`
+            WITH date_points AS (
+                SELECT (sm + (off || ' days')::interval)::date as d
+                FROM generate_series('2026-01-01'::date, date_trunc('month', CURRENT_DATE), '1 month'::interval) sm
+                CROSS JOIN (VALUES (0), (14)) AS offsets(off)
+                WHERE (sm + (off || ' days')::interval) <= CURRENT_DATE
+            )
+            SELECT 
+                CASE 
+                    WHEN EXTRACT(DAY FROM d) = 1 THEN TO_CHAR(d, 'Mon')
+                    ELSE TO_CHAR(d, 'Mon') || ' 15'
+                END as month_label,
+                d as raw_date,
+                (SELECT COALESCE(SUM(total_price), 0) FROM rentals 
+                 WHERE created_at >= d AND created_at < (
+                     CASE 
+                        WHEN EXTRACT(DAY FROM d) = 1 THEN d + INTERVAL '14 days'
+                        ELSE date_trunc('month', d) + INTERVAL '1 month'
+                     END
+                 )) as revenue,
+                (SELECT COALESCE(SUM(amount), 0) FROM expenses 
+                 WHERE date >= d AND date < (
+                     CASE 
+                        WHEN EXTRACT(DAY FROM d) = 1 THEN d + INTERVAL '14 days'
+                        ELSE date_trunc('month', d) + INTERVAL '1 month'
+                     END
+                 )) as expenses
+            FROM date_points
+            ORDER BY raw_date ASC
+        `;
+    }
 
     // 2. Top Performing Scooters (By Revenue)
     const topScooters = await sql`

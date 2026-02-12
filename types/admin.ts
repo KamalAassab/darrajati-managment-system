@@ -10,7 +10,6 @@ export interface Scooter {
     price: number;
     quantity: number;
     activeRentals?: number;
-    maintenanceCount?: number;
     availableCount?: number;
     status: 'available' | 'rented' | 'maintenance'; // Computed for display compatibility
     createdAt: string;

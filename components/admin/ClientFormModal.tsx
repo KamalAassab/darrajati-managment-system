@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
 import { createClient, updateClient } from '@/app/actions';
 import { Client } from '@/types/admin';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, User, FileBadge, Phone } from 'lucide-react';
 
 interface ClientFormModalProps {
     isOpen: boolean;
@@ -58,85 +57,90 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
+            <div className="relative w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
 
                 {/* Header */}
-                <div className="p-8 border-b border-white/10 bg-[#0a0a0a] flex justify-between items-center">
-                    <div>
-                        <h2 className="text-2xl font-anton uppercase tracking-wide text-white">
-                            {isEdit ? 'Edit Client' : 'New Client'}
-                        </h2>
-                        <p className="text-xs text-white/50 font-mono mt-1 uppercase tracking-widest">
-                            {isEdit ? 'Update client information' : 'Add a new client to the database'}
-                        </p>
-                    </div>
-                    <button onClick={onClose} className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-full transition-colors">
+                <div className="sticky top-0 z-10 flex items-center justify-between p-6 bg-[#0a0a0a] border-b border-white/10">
+                    <h2 className="text-2xl font-anton text-white uppercase tracking-wide">
+                        {isEdit ? 'Edit Client' : 'New Client'}
+                    </h2>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
+                    >
                         <X className="w-6 h-6" />
                     </button>
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="p-8 overflow-y-auto custom-scrollbar space-y-8">
+                <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
                     {error && (
-                        <div className="bg-red-500/10 border border-red-500/20 text-red-500 p-4 rounded-xl text-sm font-bold text-center">
+                        <div className="p-4 rounded-xl border bg-red-500/10 border-red-500/30 text-red-500 text-sm font-bold">
                             {error}
                         </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-6">
+                        {/* Full Name */}
                         <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Full Name</label>
+                            <label className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <User className="w-4 h-4 text-primary" /> Full Name
+                            </label>
                             <input
                                 type="text"
                                 name="fullName"
                                 defaultValue={client?.fullName}
                                 required
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
+                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
                                 placeholder="Enter client name"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Document ID</label>
-                            <input
-                                type="text"
-                                name="documentId"
-                                defaultValue={client?.documentId}
-                                required
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
-                                placeholder="e.g. AB123456"
-                            />
+                        {/* Row 2: ID & Phone */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                    <FileBadge className="w-4 h-4 text-blue-500" /> Document ID
+                                </label>
+                                <input
+                                    type="text"
+                                    name="documentId"
+                                    defaultValue={client?.documentId}
+                                    required
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                                    placeholder="e.g. AB123456"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                    <Phone className="w-4 h-4 text-green-500" /> Phone
+                                </label>
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    defaultValue={client?.phone}
+                                    required
+                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all font-medium"
+                                    placeholder="+212 6..."
+                                />
+                            </div>
                         </div>
-
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 ml-1">Phone</label>
-                            <input
-                                type="tel"
-                                name="phone"
-                                defaultValue={client?.phone}
-                                required
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all placeholder:text-white/10"
-                                placeholder="+212 6..."
-                            />
-                        </div>
-
-
                     </div>
 
-
-
-                    <div className="pt-4 flex gap-4">
+                    <div className="flex gap-4 pt-4 border-t border-white/10">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-4 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-xl font-bold uppercase tracking-wide transition-all"
+                            className="flex-1 px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-xl font-semibold transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="flex-[2] py-4 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold uppercase tracking-wide transition-all primary-glow flex items-center justify-center gap-2"
+                            className="flex-1 px-6 py-3 bg-[#ea6819] hover:bg-[#ea6819]/90 disabled:bg-[#ea6819]/50 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#ea6819]/20"
                         >
                             {isSubmitting ? (
                                 <>
@@ -144,7 +148,7 @@ export function ClientFormModal({ isOpen, onClose, client }: ClientFormModalProp
                                     Saving...
                                 </>
                             ) : (
-                                isEdit ? 'Edit Client' : 'New Client'
+                                isEdit ? 'Update Client' : 'Create Client'
                             )}
                         </button>
                     </div>

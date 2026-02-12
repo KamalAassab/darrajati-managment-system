@@ -93,8 +93,8 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
         <div className="space-y-8 pb-20 font-outfit">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                    <Settings className="w-6 h-6 text-primary" />
+                <div className="w-12 h-12 rounded-2xl bg-[#ea6819]/10 border border-[#ea6819]/20 flex items-center justify-center">
+                    <Settings className="w-6 h-6 text-[#ea6819]" />
                 </div>
                 <div>
                     <h1 className="text-2xl md:text-3xl text-white uppercase font-bold">Settings</h1>
@@ -144,7 +144,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                         <button
                             type="submit"
                             disabled={usernameLoading || newUsername === currentUser.username}
-                            className="w-full bg-primary text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-[#ea6819] text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-[#ea6819]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {usernameLoading ? 'Updating...' : 'Update Username'}
                         </button>
@@ -246,7 +246,7 @@ export default function SettingsPageClient({ currentUser }: SettingsPageClientPr
                         <button
                             type="submit"
                             disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}
-                            className="w-full bg-primary text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-[#ea6819] text-white py-3 rounded-xl font-bold uppercase tracking-tight hover:bg-[#ea6819]/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {passwordLoading ? 'Updating...' : 'Update Password'}
                         </button>

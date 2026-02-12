@@ -42,8 +42,8 @@ export default function TopScooters({ scooters }: TopScootersProps) {
                     >
                         {/* Left: Rank + Name */}
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                <span className="text-[10px] font-black text-primary">{index + 1}</span>
+                            <div className="w-6 h-6 rounded-lg bg-[#ea6819] flex items-center justify-center flex-shrink-0 shadow-[0_0_10px_rgba(234,104,25,0.5)]">
+                                <span className="text-[10px] font-black text-white">{index + 1}</span>
                             </div>
                             <span className="text-sm font-bold text-white truncate group-hover:text-primary transition-colors">
                                 {scooter.name}

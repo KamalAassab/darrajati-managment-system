@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { Scooter } from '@/types/admin';
-import { updateMaintenanceCountAction, deleteScooter } from '@/app/actions';
+import { deleteScooter } from '@/app/actions';
 import { formatMAD } from '@/lib/utils/currency';
 import { Trash2, Search, Filter, Hash, MoreHorizontal, Settings2, ChevronDown, Plus, Minus, Wrench, CheckCircle2, Bike } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -59,22 +59,6 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
         });
     }, [scooters, searchTerm, statusFilter]);
 
-    const handleMaintenanceChange = async (id: string, currentCount: number, change: number, max: number) => {
-        const newCount = currentCount + change;
-        if (newCount < 0 || newCount > max) return;
-
-        setUpdating(id);
-
-        const result = await updateMaintenanceCountAction(id, newCount);
-
-        if (result.success) {
-            router.refresh();
-        } else {
-            console.error('Failed to update maintenance count', result.message);
-        }
-        setUpdating(null);
-    };
-
     const handleDelete = (id: string) => {
         setConfirmModal({
             isOpen: true,
@@ -121,7 +105,7 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
             <div className="flex flex-col-reverse md:flex-row gap-4 items-center justify-between relative z-50 mb-6">
                 {/* Filter Tabs */}
                 <div className="flex p-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl w-full md:w-auto overflow-x-auto no-scrollbar shadow-xl shadow-black/5">
-                    {['all', 'available', 'rented', 'maintenance'].map((status) => (
+                    {['all', 'available', 'rented'].map((status) => (
                         <button
                             key={status}
                             onClick={() => setStatusFilter(status)}
@@ -138,7 +122,6 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                             {status === 'all' && <Filter className={`w-3.5 h-3.5 ${statusFilter !== 'all' ? 'text-white/40' : 'text-black/60'}`} />}
                             {status === 'available' && <CheckCircle2 className={`w-3.5 h-3.5 ${statusFilter !== 'available' ? 'text-green-500/50' : 'text-white'}`} />}
                             {status === 'rented' && <Bike className={`w-3.5 h-3.5 ${statusFilter !== 'rented' ? 'text-blue-500/50' : 'text-white'}`} />}
-                            {status === 'maintenance' && <Wrench className={`w-3.5 h-3.5 ${statusFilter !== 'maintenance' ? 'text-red-500/50' : 'text-white'}`} />}
                             {statusLabels[status] || status}
                         </button>
                     ))}
@@ -162,9 +145,6 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                 {filteredScooters.map((scooter, index) => {
                     const availableCount = scooter.availableCount ?? 0;
                     const rentedCount = scooter.activeRentals || 0;
-                    const maintenanceCount = scooter.maintenanceCount || 0;
-                    // Max maintenance is quantity - rented (can't put rented scooters in maintenance)
-                    const maxMaintenance = (scooter.quantity || 1) - rentedCount;
 
                     return (
                         <div
@@ -173,7 +153,7 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                         >
                             {/* Status Strip */}
                             <div className={`absolute top-0 left-0 w-full h-1.5 transition-colors duration-300 z-20 ${availableCount > 0 ? 'bg-green-500 shadow-[0_0_20px_rgba(34,197,94,0.5)]' :
-                                (maintenanceCount > 0 && availableCount === 0) ? 'bg-red-500 shadow-[0_0_20px_rgba(239,68,68,0.5)]' : 'bg-primary shadow-[0_0_20px_rgba(255,107,0,0.5)]'
+                                'bg-primary shadow-[0_0_20px_rgba(255,107,0,0.5)]'
                                 }`} />
 
                             {/* Header: ID & Actions */}
@@ -235,28 +215,9 @@ export function AdminScootersTable({ scooters, onEdit }: AdminScootersTableProps
                                         <span className="text-[9px] font-bold text-primary uppercase tracking-widest mb-1">Rented</span>
                                         <span className="font-anton text-xl text-white">{rentedCount}</span>
                                     </div>
-                                    <div className="w-px h-6 bg-white/10" />
-                                    <div className="flex flex-col items-center flex-1 relative group/maint">
-                                        <span className="text-[9px] font-bold text-red-500 uppercase tracking-widest mb-1 flex items-center gap-1">
-                                            Maint <Wrench className="w-3 h-3" />
-                                        </span>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => handleMaintenanceChange(scooter.id, maintenanceCount, -1, maxMaintenance)}
-                                                disabled={maintenanceCount <= 0 || updating === scooter.id}
-                                                className="w-5 h-5 flex items-center justify-center rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white transition-colors"
-                                            >
-                                                <Minus className="w-3 h-3" />
-                                            </button>
-                                            <span className="font-anton text-xl text-white min-w-[20px] text-center">{maintenanceCount}</span>
-                                            <button
-                                                onClick={() => handleMaintenanceChange(scooter.id, maintenanceCount, 1, maxMaintenance)}
-                                                disabled={availableCount <= 0 || updating === scooter.id}
-                                                className="w-5 h-5 flex items-center justify-center rounded bg-white/10 hover:bg-white/20 disabled:opacity-30 text-white transition-colors"
-                                            >
-                                                <Plus className="w-3 h-3" />
-                                            </button>
-                                        </div>
+                                    <div className="flex flex-col items-center flex-1">
+                                        <span className="text-[9px] font-bold text-primary uppercase tracking-widest mb-1">Rented</span>
+                                        <span className="font-anton text-xl text-white">{rentedCount}</span>
                                     </div>
                                 </div>
 

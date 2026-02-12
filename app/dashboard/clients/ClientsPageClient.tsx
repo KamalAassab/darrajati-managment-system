@@ -79,7 +79,7 @@ export default function ClientsPageClient({ initialClients }: ClientsPageClientP
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
                     <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton">
-                        <Users className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                        <Users className="w-6 h-6 md:w-8 md:h-8 text-[#ea6819]" />
                         Client Database
                     </h1>
                 </div>
@@ -100,7 +100,7 @@ export default function ClientsPageClient({ initialClients }: ClientsPageClientP
                     {/* Add Button */}
                     <button
                         onClick={handleCreate}
-                        className="bg-primary text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-primary/20"
+                        className="bg-[#ea6819] text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-[#ea6819]/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-[#ea6819]/20"
                     >
                         <Plus className="w-5 h-5" />
                         <span>Add Client</span>

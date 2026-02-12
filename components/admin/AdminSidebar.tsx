@@ -10,8 +10,8 @@ import {
     DollarSign,
     LogOut,
     AlertTriangle,
-    ChevronRight,
-    ChevronLeft,
+    ChevronsRight,
+    ChevronsLeft,
     Settings
 } from 'lucide-react';
 import { logout } from '@/app/actions';
@@ -58,29 +58,10 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
             )}
 
             <aside className={sidebarClasses}>
-                <div className="absolute -right-3 top-8 z-50 hidden md:block">
-                    <button
-                        onClick={onToggle}
-                        className="glass-panel-dark text-white/50 hover:text-white p-1.5 rounded-full shadow-lg hover:bg-white/10 transition-all border border-white/10"
-                    >
-                        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-                    </button>
-                </div>
-
-                {/* Mobile Close Button */}
-                <div className="absolute right-4 top-4 md:hidden">
-                    <button
-                        onClick={onMobileClose}
-                        className="text-white/50 hover:text-white transition-colors"
-                    >
-                        <ChevronLeft size={24} />
-                    </button>
-                </div>
-
-                <div className={`p-8 pb-4 ${isCollapsed ? 'md:px-4 md:flex md:flex-col md:items-center' : ''}`}>
+                <div className={`relative transition-all duration-300 ${isCollapsed ? 'p-4 py-6 flex flex-col items-center justify-center' : 'p-8 pb-4'}`}>
                     <Link href="/dashboard" prefetch={true} className="block" onClick={onMobileClose}>
                         {isCollapsed ? (
-                            <div className="relative w-10 h-10 md:w-12 md:h-12 transition-all duration-300">
+                            <div className="relative w-12 h-12 md:w-14 md:h-14 transition-all duration-300">
                                 <img
                                     src="/logo.webp"
                                     alt="Darrajati Admin"
@@ -88,7 +69,7 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                                 />
                             </div>
                         ) : (
-                            <div className="relative w-full h-16 transition-all duration-300">
+                            <div className="relative w-full h-24 transition-all duration-300">
                                 <img
                                     src="/logo.webp"
                                     alt="Darrajati Admin"
@@ -97,7 +78,22 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                             </div>
                         )}
                     </Link>
-                    <div className={`h-[1px] bg-primary mt-4 opacity-50 ${isCollapsed ? 'md:w-8' : 'w-12'}`}></div>
+
+                    {/* Collapse Button */}
+                    <div className={`hidden md:block z-50 ${isCollapsed ? 'mt-4' : 'absolute -right-3 top-8'}`}>
+                        <button
+                            onClick={onToggle}
+                            className={`bg-[#ea6819] text-white rounded-full shadow-[0_0_15px_rgba(234,104,25,0.4)] hover:shadow-[0_0_25px_rgba(234,104,25,0.6)] hover:scale-110 transition-all duration-300 border border-white/20 flex items-center justify-center group ${isCollapsed ? 'p-1.5' : 'p-2'}`}
+                        >
+                            {isCollapsed ? (
+                                <ChevronsRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                            ) : (
+                                <ChevronsLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
+                            )}
+                        </button>
+                    </div>
+
+                    <div className={`h-[1px] bg-primary mt-4 opacity-50 ${isCollapsed ? 'w-8' : 'w-12'}`}></div>
                 </div>
 
                 <nav className={`flex-1 overflow-y-auto py-4 space-y-6 admin-scrollbar ${isCollapsed ? 'md:px-3' : 'px-8'}`}>
@@ -111,13 +107,13 @@ export function AdminSidebar({ overdueRentals = [], isCollapsed, onToggle, isMob
                                     href={item.href}
                                     prefetch={true}
                                     onClick={onMobileClose}
-                                    className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-300 group relative ${isActive
-                                        ? 'bg-primary/10 text-primary border border-primary/20'
-                                        : 'text-white/50 hover:text-white hover:bg-white/5 border border-transparent'
-                                        } ${isCollapsed ? 'md:justify-center' : ''}`}
+                                    className={`flex items-center gap-4 px-4 py-3.5 mx-2 rounded-xl transition-all duration-300 group relative ${isActive
+                                        ? 'bg-[#ea6819] text-white font-bold shadow-[0_0_20px_rgba(234,104,25,0.3)]'
+                                        : 'text-white/50 hover:text-white hover:bg-white/5'
+                                        } ${isCollapsed ? 'md:justify-center md:px-0 md:mx-0' : ''}`}
                                     title={isCollapsed ? item.label : ''}
                                 >
-                                    <ItemIcon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-primary' : 'text-white/30'}`} />
+                                    <ItemIcon className={`w-5 h-5 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white' : 'text-white/30'}`} />
                                     <span className={`text-sm tracking-tight ${isCollapsed ? 'md:hidden' : ''} ${isActive ? 'font-semibold' : 'font-medium'}`}>{item.label}</span>
                                     {item.badge && (
                                         <span className={`absolute ${isCollapsed ? 'md:-top-1 md:-right-1 top-1/2 -translate-y-1/2 right-3' : 'right-3'} min-w-[20px] h-[20px] bg-red-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full shadow-lg`}>

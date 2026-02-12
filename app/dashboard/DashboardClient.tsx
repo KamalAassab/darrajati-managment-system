@@ -31,8 +31,8 @@ export default function DashboardClient({
         <div className="space-y-6 pb-10">
             {/* Header */}
             <div>
-                <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton">
-                    <Activity className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                <h1 className="text-2xl md:text-3xl text-white uppercase flex items-center gap-3 font-anton text-glow-primary">
+                    <Activity className="w-6 h-6 md:w-8 md:h-8 text-[#ea6819] drop-shadow-[0_0_10px_rgba(234,104,25,0.5)]" />
                     Dashboard
                 </h1>
             </div>
@@ -82,14 +82,14 @@ export default function DashboardClient({
                 </div >
 
                 {/* Recent Activity */}
-                < div className="lg:col-span-2 bg-[#050505] border border-white/[0.03] rounded-[2rem] p-6 relative overflow-hidden" >
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32" />
+                < div className="lg:col-span-2 bg-[#050505] border border-white/[0.03] rounded-[2rem] p-6 relative overflow-hidden group hover:border-primary/20 transition-colors duration-500" >
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px] -mr-32 -mt-32" />
 
                     <div className="flex justify-between items-center mb-6 relative z-10 px-2">
                         <div>
                             <h3 className="text-xl text-white uppercase font-bold">Operation Stream</h3>
                         </div>
-                        <Link href="/dashboard/rentals" className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-primary transition-all flex items-center gap-2 group border border-white/5 px-3 py-1.5 rounded-lg hover:border-primary/30">
+                        <Link href="/dashboard/rentals" className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/40 hover:text-primary transition-all flex items-center gap-2 group border border-white/5 px-3 py-1.5 rounded-lg hover:border-primary/30 hover:bg-primary/5">
                             View All <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                         </Link>
                     </div>
@@ -97,7 +97,7 @@ export default function DashboardClient({
                     <div className="overflow-x-auto admin-scrollbar relative z-10">
                         <table className="w-full border-separate border-spacing-y-2">
                             <thead>
-                                <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-white/20">
+                                <tr className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">
                                     <th className="text-left pb-2 pl-4">Client / Unit</th>
                                     <th className="text-left pb-2 hidden md:table-cell">Rental Period</th>
                                     <th className="text-center pb-2 hidden lg:table-cell">Duration</th>

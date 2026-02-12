@@ -23,15 +23,15 @@ const config: Config = {
                     DEFAULT: 'rgba(255, 255, 255, 0.05)',
                     foreground: 'rgba(255, 255, 255, 0.6)',
                 },
-                accent: 'rgba(217, 119, 6, 0.1)', // Amber accent
-                ring: '#d97706',
+                accent: 'rgba(234, 104, 25, 0.1)', // Amber accent
+                ring: '#ea6819',
                 input: 'rgba(255, 255, 255, 0.08)',
                 border: 'rgba(255, 255, 255, 0.08)',
                 destructive: '#ef4444',
                 'destructive-foreground': '#ffffff',
                 'popover-foreground': '#ffffff',
                 primary: {
-                    DEFAULT: '#d97706',
+                    DEFAULT: '#ea6819',
                     foreground: '#ffffff',
                 },
             },

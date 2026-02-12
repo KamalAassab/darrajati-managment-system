@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { Plus, Search, Activity, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { RentalPaymentsModal } from '@/components/admin/RentalPaymentsModal';
+import { RentalFormModal } from '@/components/admin/RentalFormModal';
 import { useState } from 'react';
-import { RentalWithDetails } from '@/types/admin';
+import { RentalWithDetails, Scooter } from '@/types/admin';
 import { RentalStats } from '@/components/admin/RentalStats';
 import { RentalCard } from '@/components/admin/RentalCard';
 import { cn } from '@/lib/utils';
@@ -13,12 +14,14 @@ import { isOverdue } from '@/lib/utils/currency';
 interface RentalsPageClientProps {
     activeRentals: RentalWithDetails[];
     completedRentals: RentalWithDetails[];
+    scooters: Scooter[];
 }
 
-export default function RentalsPageClient({ activeRentals, completedRentals }: RentalsPageClientProps) {
+export default function RentalsPageClient({ activeRentals, completedRentals, scooters }: RentalsPageClientProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'overdue' | 'completed'>('all');
     const [paymentModalRental, setPaymentModalRental] = useState<RentalWithDetails | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Combine all rentals for filtering
     const allRentals = [...activeRentals, ...completedRentals];
@@ -54,7 +57,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
     const completedCount = completedRentals.length;
 
     return (
-        <div className="space-y-8 pb-20 font-outfit">
+        <div className="space-y-8 pb-20 font-outfit" suppressHydrationWarning>
             {/* Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                 <div>
@@ -66,13 +69,13 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
 
                 <div className="flex items-center gap-4 w-full md:w-auto">
                     {/* Create Button */}
-                    <Link
-                        href="/dashboard/rentals/new"
-                        className="bg-primary text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-primary/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-primary/20"
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="bg-[#ea6819] text-white w-full md:w-auto h-12 md:h-auto px-6 py-3 rounded-2xl flex items-center justify-center gap-2 hover:bg-[#ea6819]/90 transition-all duration-300 primary-glow font-bold uppercase tracking-tight active:scale-95 cursor-pointer shadow-lg shadow-[#ea6819]/20"
                     >
                         <Plus className="w-5 h-5" />
                         <span>Create Rental</span>
-                    </Link>
+                    </button>
                 </div>
             </div>
 
@@ -180,21 +183,27 @@ export default function RentalsPageClient({ activeRentals, completedRentals }: R
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                        {filteredRentals.map((rental) => (
-                            <RentalCard
-                                key={rental.id}
-                                rental={rental}
-                                onPayment={setPaymentModalRental}
-                            />
-                        ))}
-                    </div>
+                    {filteredRentals.map((rental) => (
+                        <RentalCard
+                            key={rental.id}
+                            rental={rental}
+                            onPayment={setPaymentModalRental}
+                        />
+                    ))}
+                </div>
             )}
 
-                    <RentalPaymentsModal
-                        isOpen={!!paymentModalRental}
-                        onClose={() => setPaymentModalRental(null)}
-                        rental={paymentModalRental}
-                    />
-                </div>
-            );
+            <RentalPaymentsModal
+                isOpen={!!paymentModalRental}
+                onClose={() => setPaymentModalRental(null)}
+                rental={paymentModalRental}
+            />
+
+            <RentalFormModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                scooters={scooters}
+            />
+        </div>
+    );
 }
