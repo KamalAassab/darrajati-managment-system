@@ -1,5 +1,0 @@
-=== DEBUGGING USER "soufiane0000" ===
-
-All Users in DB: [ { id: 4, username: 'admin' } ]
-
-ÔØî User "soufiane0000" NOT FOUND.
