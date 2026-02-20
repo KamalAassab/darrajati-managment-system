@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { RentalWithDetails } from '@/types/admin';
 import { formatMAD, formatDate, formatDateShort, isOverdue } from '@/lib/utils/currency';
-import { Bike, CreditCard, ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { Bike, CreditCard, ArrowUpRight, ShieldCheck, Edit2, FileText } from 'lucide-react';
+import Link from 'next/link';
 import DeleteRentalButton from '@/app/dashboard/rentals/components/DeleteRentalButton';
 import CompleteRentalButton from '@/app/dashboard/rentals/components/CompleteRentalButton';
 import RevertRentalButton from '@/app/dashboard/rentals/components/RevertRentalButton';
@@ -10,13 +12,16 @@ import RevertRentalButton from '@/app/dashboard/rentals/components/RevertRentalB
 interface RentalCardProps {
     rental: RentalWithDetails;
     onPayment: (rental: RentalWithDetails) => void;
+    onEdit: (rental: RentalWithDetails) => void;
 }
 
-export function RentalCard({ rental, onPayment }: RentalCardProps) {
+export function RentalCard({ rental, onPayment, onEdit }: RentalCardProps) {
     const overdue = isOverdue(rental.endDate) && rental.status === 'active';
     const totalPaid = rental.amountPaid || 0;
     const totalPrice = rental.totalPrice || 0;
     const remaining = Math.max(0, totalPrice - totalPaid);
+
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     // Payment Status logic
     const isFullyPaid = totalPaid >= totalPrice;
@@ -30,6 +35,11 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
             ? 'border-red-500/50 shadow-[0_0_40px_-10px_rgba(239,68,68,0.3)] hover:border-red-500'
             : 'border-white/10 hover:border-primary/50 hover:shadow-[0_0_40px_-20px_rgba(234,104,25,0.3)]'
             }`}>
+            <div
+                className="absolute inset-0 z-0 cursor-pointer"
+                onClick={() => setIsDrawerOpen(true)}
+            />
+
             {/* Top Status Indicators */}
             <div className="px-5 pt-5 flex items-center justify-between gap-2 z-10">
                 <div className="flex items-center gap-2">
@@ -61,7 +71,7 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
                     )}
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 relative z-10">
                     <button
                         onClick={() => onPayment(rental)}
                         className={`p-3 rounded-xl transition-all border flex items-center justify-center hover:scale-105 active:scale-95 ${isFullyPaid
@@ -73,13 +83,21 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
                     >
                         <CreditCard className="w-4 h-4" />
                     </button>
+                    <button
+                        onClick={() => onEdit(rental)}
+                        className="p-3 rounded-xl transition-all border flex items-center justify-center hover:scale-105 active:scale-95 bg-white/5 text-white/50 border-white/10 hover:bg-white/10 hover:text-white"
+                        title="Edit Rental"
+                    >
+                        <Edit2 className="w-4 h-4" />
+                    </button>
                     <DeleteRentalButton rentalId={rental.id} />
                 </div>
             </div>
 
             {/* Client & Info */}
-            <div className="p-4 md:p-5 space-y-4 flex-1">
-                <div>
+            <div className="p-4 md:p-5 space-y-4 flex-1 relative z-10 pointer-events-none">
+                {/* Re-enable pointer events for buttons/links inside */}
+                <div className="pointer-events-auto">
                     <h3 className="text-lg md:text-2xl font-black font-outfit text-white uppercase tracking-tighter leading-tight truncate group-hover/rental:text-primary transition-colors">
                         {rental.client.fullName}
                     </h3>
@@ -120,7 +138,7 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
                 </div>
 
                 {/* Payment Progress */}
-                <div className="space-y-2">
+                <div className="space-y-2 mt-4 md:mt-0">
                     <div className="flex justify-between items-end gap-2">
                         <span className="text-[9px] md:text-[10px] font-bold text-white/30 uppercase tracking-widest truncate">Payment Progress</span>
                         <div className="text-right shrink-0">
@@ -145,7 +163,7 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
                 </div>
 
                 {/* Bottom Action */}
-                <div className="pt-2">
+                <div className="pt-2 pointer-events-auto">
                     <div className="flex items-center gap-2">
                         <div className="flex-1">
                             {rental.status === 'active' ? (
@@ -156,6 +174,16 @@ export function RentalCard({ rental, onPayment }: RentalCardProps) {
                         </div>
                     </div>
                 </div>
+
+                {/* Notes (if any) */}
+                {rental.notes && (
+                    <div className="p-3 bg-white/[0.02] border border-white/5 rounded-xl mt-1 flex items-start gap-2 max-h-24 overflow-y-auto custom-scrollbar pointer-events-auto">
+                        <FileText className="w-4 h-4 text-white/30 shrink-0 mt-0.5" />
+                        <p className="font-poppins text-[13px] font-normal text-white/70 leading-relaxed break-words whitespace-pre-wrap">
+                            {rental.notes}
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );

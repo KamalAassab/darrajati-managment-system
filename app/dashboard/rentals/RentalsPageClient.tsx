@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Plus, Search, Activity, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { RentalPaymentsModal } from '@/components/admin/RentalPaymentsModal';
 import { RentalFormModal } from '@/components/admin/RentalFormModal';
+import { EditRentalModal } from '@/components/admin/EditRentalModal';
 import { useState } from 'react';
 import { RentalWithDetails, Scooter } from '@/types/admin';
 import { RentalStats } from '@/components/admin/RentalStats';
@@ -21,6 +22,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals, sco
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'overdue' | 'completed'>('all');
     const [paymentModalRental, setPaymentModalRental] = useState<RentalWithDetails | null>(null);
+    const [editModalRental, setEditModalRental] = useState<RentalWithDetails | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     // Combine all rentals for filtering
@@ -192,6 +194,7 @@ export default function RentalsPageClient({ activeRentals, completedRentals, sco
                             key={rental.id}
                             rental={rental}
                             onPayment={setPaymentModalRental}
+                            onEdit={setEditModalRental}
                         />
                     ))}
                 </div>
@@ -206,6 +209,13 @@ export default function RentalsPageClient({ activeRentals, completedRentals, sco
             <RentalFormModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
+                scooters={scooters}
+            />
+
+            <EditRentalModal
+                isOpen={!!editModalRental}
+                onClose={() => setEditModalRental(null)}
+                rental={editModalRental}
                 scooters={scooters}
             />
         </div>

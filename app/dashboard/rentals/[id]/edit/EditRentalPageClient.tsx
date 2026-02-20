@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateRental } from '@/app/actions';
 import { calculateRentalPrice, formatMAD } from '@/lib/utils/currency';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
 export default function EditRentalPageClient({
@@ -18,14 +18,13 @@ export default function EditRentalPageClient({
     const [loading, setLoading] = useState(false);
 
     const [selectedScooter, setSelectedScooter] = useState(rental.scooterId);
-    const [startDate, setStartDate] = useState(rental.startDate);
-    const [endDate, setEndDate] = useState(rental.endDate);
+    const [startDate, setStartDate] = useState(rental.startDate ? rental.startDate.split('T')[0] : '');
+    const [endDate, setEndDate] = useState(rental.endDate ? rental.endDate.split('T')[0] : '');
     const [totalPrice, setTotalPrice] = useState(rental.totalPrice);
-    const [amountPaid, setAmountPaid] = useState(rental.amountPaid);
-    const [paymentMethod, setPaymentMethod] = useState(rental.paymentMethod);
+    const [paymentMethod] = useState(rental.paymentMethod);
     const [notes, setNotes] = useState(rental.notes || '');
 
-    const [isAmountManuallyChanged, setIsAmountManuallyChanged] = useState(true);
+
 
     useEffect(() => {
         if (selectedScooter && startDate && endDate) {
@@ -37,7 +36,8 @@ export default function EditRentalPageClient({
         }
     }, [selectedScooter, startDate, endDate, scooters]);
 
-    const derivedPaymentStatus = amountPaid >= totalPrice ? 'paid' : (amountPaid > 0 ? 'partial' : 'pending');
+    const amountPaid = rental.amountPaid || 0;
+    const derivedPaymentStatus = rental.paymentStatus;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -49,6 +49,7 @@ export default function EditRentalPageClient({
         formData.set('totalPrice', totalPrice.toString());
         formData.set('amountPaid', amountPaid.toString());
         formData.set('paymentStatus', derivedPaymentStatus);
+        formData.set('paymentMethod', paymentMethod);
 
         try {
             const result = await updateRental(rental.id, formData);
@@ -146,35 +147,13 @@ export default function EditRentalPageClient({
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-medium uppercase tracking-widest text-white/40 ml-1">Deposit Amount (MAD)</label>
-                            <div className="relative">
-                                <input
-                                    type="number"
-                                    name="amountPaid"
-                                    min="0"
-                                    step="1"
-                                    required
-                                    value={amountPaid}
-                                    onChange={(e) => setAmountPaid(Math.max(0, parseInt(e.target.value) || 0))}
-                                    className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all"
-                                />
-                                <span className="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-bold text-white/20 uppercase tracking-widest">MAD</span>
+                        <div className="space-y-2 col-span-1 md:col-span-2">
+                            <div className="p-4 bg-white/5 border border-white/10 rounded-xl text-center">
+                                <p className="text-xs font-medium uppercase tracking-widest text-white/40 mb-1 flex items-center justify-center gap-2">
+                                    <CreditCard className="w-4 h-4" /> Financials Locked
+                                </p>
+                                <p className="text-sm font-bold text-white/80">Payments are managed via the dedicated "Add Payment" modal on the Rentals page.</p>
                             </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-xs font-medium uppercase tracking-widest text-white/40 ml-1">Transaction Method</label>
-                            <select
-                                name="paymentMethod"
-                                required
-                                value={paymentMethod}
-                                onChange={(e) => setPaymentMethod(e.target.value)}
-                                className="w-full px-5 py-4 bg-white/5 border border-white/10 rounded-xl text-white text-sm font-medium focus:ring-2 focus:ring-primary/30 outline-none transition-all appearance-none"
-                            >
-                                <option value="cash" className="bg-[#111]">Cash</option>
-                                <option value="transfer" className="bg-[#111]">Bank Transfer</option>
-                            </select>
                         </div>
                     </div>
 

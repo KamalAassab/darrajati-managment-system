@@ -488,7 +488,7 @@ export async function getRentals(): Promise<RentalWithDetails[]> {
         SELECT 
           r.*,
           s.name as scooter_name, s.image as scooter_image,
-          c.full_name as client_name, c.phone as client_phone
+          c.full_name as client_name, c.phone as client_phone, c.document_id as client_document_id
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
         JOIN clients c ON r.client_id = c.id
@@ -503,7 +503,7 @@ export async function getActiveRentals(): Promise<RentalWithDetails[]> {
         SELECT 
           r.*,
           s.name as scooter_name, s.image as scooter_image,
-          c.full_name as client_name, c.phone as client_phone
+          c.full_name as client_name, c.phone as client_phone, c.document_id as client_document_id
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
         JOIN clients c ON r.client_id = c.id
@@ -519,7 +519,7 @@ export async function getOverdueRentals(): Promise<RentalWithDetails[]> {
         SELECT 
           r.*,
           s.name as scooter_name, s.image as scooter_image,
-          c.full_name as client_name, c.phone as client_phone
+          c.full_name as client_name, c.phone as client_phone, c.document_id as client_document_id
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
         JOIN clients c ON r.client_id = c.id
@@ -535,7 +535,7 @@ export async function getCompletedRentals(limit: number = 20): Promise<RentalWit
         SELECT 
           r.*,
           s.name as scooter_name, s.image as scooter_image,
-          c.full_name as client_name, c.phone as client_phone
+          c.full_name as client_name, c.phone as client_phone, c.document_id as client_document_id
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
         JOIN clients c ON r.client_id = c.id
@@ -552,7 +552,7 @@ export async function getLatestRentals(limit: number = 5): Promise<RentalWithDet
         SELECT 
           r.*,
           s.name as scooter_name, s.image as scooter_image,
-          c.full_name as client_name, c.phone as client_phone
+          c.full_name as client_name, c.phone as client_phone, c.document_id as client_document_id
         FROM rentals r
         JOIN scooters s ON r.scooter_id = s.id
         JOIN clients c ON r.client_id = c.id
@@ -588,6 +588,7 @@ function mapRowsToRentalWithDetails(rows: any[]): RentalWithDetails[] {
             id: row.client_id.toString(),
             fullName: row.client_name,
             phone: row.client_phone,
+            documentId: row.client_document_id,
         } as any,
     }));
 }
@@ -867,12 +868,17 @@ export async function updateRental(id: string, formData: FormData): Promise<Acti
     await requireAuth();
 
     try {
-        const validatedData = rentalSchema.parse({
+        const clientData = {
+            fullName: formData.get('clientFullName'),
+            documentId: formData.get('clientDocumentId'),
+            phone: formData.get('clientPhone'),
+        };
+
+        const validatedClient = clientSchema.parse(clientData);
+
+        const validatedRental = rentalSchema.parse({
             scooterId: formData.get('scooterId'),
             clientId: formData.get('clientId'),
-            clientFullName: 'Existing Client',
-            clientDocumentId: 'Existing ID',
-            clientPhone: 'Existing Phone',
             startDate: formData.get('startDate'),
             endDate: formData.get('endDate'),
             totalPrice: Number(formData.get('totalPrice')),
@@ -884,19 +890,42 @@ export async function updateRental(id: string, formData: FormData): Promise<Acti
             hasDeposit: false,
         });
 
+        // 1. Update Client Information
+        await sql`
+            UPDATE clients 
+            SET 
+                full_name = ${validatedClient.fullName},
+                document_id = ${validatedClient.documentId},
+                phone = ${validatedClient.phone},
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ${validatedRental.clientId}
+        `;
+
+        // 2. Update Rental Information
         await sql`
             UPDATE rentals 
             SET 
-                start_date = ${validatedData.startDate},
-                end_date = ${validatedData.endDate},
-                total_price = ${validatedData.totalPrice},
-                amount_paid = ${validatedData.amountPaid},
-                payment_status = ${validatedData.paymentStatus},
-                payment_method = ${validatedData.paymentMethod},
-                notes = ${validatedData.notes ?? null},
+                scooter_id = ${validatedRental.scooterId},
+                start_date = ${validatedRental.startDate},
+                end_date = ${validatedRental.endDate},
+                total_price = ${validatedRental.totalPrice},
+                amount_paid = ${validatedRental.amountPaid},
+                payment_status = ${validatedRental.paymentStatus},
+                payment_method = ${validatedRental.paymentMethod},
+                notes = ${validatedRental.notes ?? null},
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ${id}
         `;
+
+        // 3. Complete Overwrite of Payment History to Match New Status
+        await sql`DELETE FROM rental_payments WHERE rental_id = ${id}`;
+
+        if (validatedRental.amountPaid > 0) {
+            await sql`
+                INSERT INTO rental_payments (rental_id, amount, date, notes)
+                VALUES (${id}, ${validatedRental.amountPaid}, CURRENT_TIMESTAMP, 'Adjusted Payment')
+            `;
+        }
 
         revalidatePath('/dashboard/rentals');
         revalidatePath(`/dashboard/rentals/${id}/edit`);
@@ -1073,7 +1102,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     await requireAuth();
 
     const [revenueRows, expenseRows, activeRentalRows, scooterRows, overdueRows] = await Promise.all([
-        sql`SELECT COALESCE(SUM(total_price), 0) as total FROM rentals`,
+        sql`SELECT COALESCE(SUM(amount_paid), 0) as total FROM rentals`,
         sql`SELECT COALESCE(SUM(amount), 0) as total FROM expenses`,
         sql`SELECT COUNT(*) as count FROM rentals WHERE status = 'active'`,
         sql`SELECT 
@@ -1120,7 +1149,7 @@ export async function getAnalyticsData(filter?: { month?: number; year?: number 
             SELECT 
                 TO_CHAR(d, 'DD Mon') as month_label,
                 d as raw_date,
-                (SELECT COALESCE(SUM(total_price), 0) FROM rentals 
+                (SELECT COALESCE(SUM(amount_paid), 0) FROM rentals 
                  WHERE created_at >= d AND created_at < (d + INTERVAL '1 day')) as revenue,
                 (SELECT COALESCE(SUM(amount), 0) FROM expenses 
                  WHERE date >= d AND date < (d + INTERVAL '1 day')) as expenses
@@ -1142,7 +1171,7 @@ export async function getAnalyticsData(filter?: { month?: number; year?: number 
                     ELSE TO_CHAR(d, 'Mon') || ' 15'
                 END as month_label,
                 d as raw_date,
-                (SELECT COALESCE(SUM(total_price), 0) FROM rentals 
+                (SELECT COALESCE(SUM(amount_paid), 0) FROM rentals 
                  WHERE created_at >= d AND created_at < (
                      CASE 
                         WHEN EXTRACT(DAY FROM d) = 1 THEN d + INTERVAL '14 days'
@@ -1168,7 +1197,7 @@ export async function getAnalyticsData(filter?: { month?: number; year?: number 
             s.name,
             s.image, 
             COUNT(r.id) as trips,
-            COALESCE(SUM(r.total_price), 0) as revenue
+            COALESCE(SUM(r.amount_paid), 0) as revenue
         FROM scooters s
         JOIN rentals r ON r.scooter_id = s.id
         GROUP BY s.id, s.name, s.image
@@ -1263,6 +1292,8 @@ export async function addRentalPayment(rentalId: string, amount: number, date: s
         `;
 
         revalidatePath('/dashboard/rentals');
+        revalidatePath('/dashboard');
+        revalidatePath('/dashboard/finances');
         return { success: true, message: 'Payment added successfully' };
     } catch (error) {
         return handleActionError(error);
@@ -1309,6 +1340,8 @@ export async function deleteRentalPayment(paymentId: string, rentalId: string): 
         `;
 
         revalidatePath('/dashboard/rentals');
+        revalidatePath('/dashboard');
+        revalidatePath('/dashboard/finances');
         return { success: true, message: 'Payment deleted successfully' };
     } catch (error) {
         return handleActionError(error);
