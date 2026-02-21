@@ -38,8 +38,12 @@ export default function OverduesPageClient({ overdueRentals }: OverduesPageClien
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                     {overdueRentals.map((rental) => {
-                        const daysOverdue = Math.ceil(
-                            (new Date().getTime() - new Date(rental.endDate).getTime()) / (1000 * 60 * 60 * 24)
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        const endDay = new Date(rental.endDate);
+                        endDay.setHours(0, 0, 0, 0);
+                        const daysOverdue = Math.round(
+                            (today.getTime() - endDay.getTime()) / (1000 * 60 * 60 * 24)
                         );
 
                         return (
